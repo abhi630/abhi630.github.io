@@ -18,3 +18,24 @@ This repository is to create a website to host the Data Science projects.
 		</div>
 	</div>
 </section>
+
+<section class="panel banner medium right">
+	<div class="content color0">
+		<h1>Banner</h1>
+			<p>Lorem ipsum dolor sit amet.</p>
+	</div>
+	<div class="image" data-position="center">
+		<img src="/path/to/image.jpg" alt="" />
+	</div>
+</section>
+
+
+<section class="panel spotlight large right">
+	<div class="content">
+		<h1>Spotlight</h1>
+			<p>Lorem ipsum dolor sit amet.</p>
+	</div>
+	<div class="image" data-position="center">
+		<img src="/path/to/image.jpg" alt="" />
+	</div>
+</section>
