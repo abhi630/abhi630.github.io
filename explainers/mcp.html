@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>What Is MCP (Model Context Protocol)? — Interactive Explainer</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;0,9..144,900;1,9..144,300;1,9..144,700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg: #0c0c0a;
@@ -32,7 +32,7 @@
   body {
     background: var(--bg);
     color: var(--text);
-    font-family: 'IBM Plex Sans', sans-serif;
+    font-family: 'DM Sans', sans-serif;
     font-size: 15px;
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
@@ -46,7 +46,7 @@
 
   /* Header */
   .ex-label {
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 10px;
     letter-spacing: 2px;
     text-transform: uppercase;
@@ -60,13 +60,13 @@
   }
 
   .ex-title {
-    font-family: 'Syne', sans-serif;
-    font-size: clamp(28px, 5vw, 42px);
-    font-weight: 800;
-    line-height: 1.1;
+    font-family: 'Fraunces', serif;
+    font-size: clamp(28px, 5vw, 48px);
+    font-weight: 900;
+    line-height: 1.05;
     color: var(--text);
     margin-bottom: 12px;
-    letter-spacing: -0.5px;
+    letter-spacing: -1px;
   }
 
   .ex-subtitle {
@@ -88,7 +88,7 @@
   }
 
   .tab-btn {
-    font-family: 'Syne', sans-serif;
+    font-family: 'DM Sans', sans-serif;
     font-size: 13px;
     font-weight: 600;
     color: var(--muted);
@@ -133,7 +133,7 @@
   .card-accent.purple::before { background: var(--purple); }
 
   .card-h {
-    font-family: 'Syne', sans-serif;
+    font-family: 'DM Sans', sans-serif;
     font-size: 20px;
     font-weight: 700;
     color: var(--text);
@@ -150,7 +150,7 @@
 
   /* Tag */
   .tag {
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 10px;
     letter-spacing: 1px;
     text-transform: uppercase;
@@ -176,7 +176,7 @@
     font-size: 14px; color: var(--sub); line-height: 1.5;
   }
   .check-list li .icon {
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 12px;
     flex-shrink: 0;
     margin-top: 1px;
@@ -206,7 +206,7 @@
     width: 32px; height: 32px;
     border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 12px;
     font-weight: 500;
     flex-shrink: 0;
@@ -216,7 +216,7 @@
   }
 
   .step-label {
-    font-family: 'Syne', sans-serif;
+    font-family: 'DM Sans', sans-serif;
     font-size: 15px;
     font-weight: 700;
     color: var(--text);
@@ -237,7 +237,7 @@
   .step-detail.open { display: block; }
 
   .step-detail-code {
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 12px;
     color: var(--amber);
     margin-bottom: 8px;
@@ -274,14 +274,14 @@
   }
 
   .arch-hub-label {
-    font-family: 'Syne', sans-serif;
+    font-family: 'DM Sans', sans-serif;
     font-size: 16px;
     font-weight: 700;
     color: var(--amber);
   }
 
   .arch-hub-sub {
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 10px;
     color: var(--sub);
     margin-top: 2px;
@@ -301,7 +301,7 @@
     border: 1px solid var(--border);
     border-radius: 4px;
     padding: 8px 20px;
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 11px;
     color: var(--sub);
     letter-spacing: 1px;
@@ -344,7 +344,7 @@
   .arch-server-icon { font-size: 20px; margin-bottom: 4px; }
 
   .arch-server-name {
-    font-family: 'Syne', sans-serif;
+    font-family: 'DM Sans', sans-serif;
     font-size: 12px;
     font-weight: 700;
     color: var(--text);
@@ -354,7 +354,7 @@
     font-size: 11px;
     color: var(--muted);
     margin-top: 2px;
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'DM Mono', monospace;
   }
 
   /* Before / After */
@@ -372,7 +372,7 @@
   .ba-side.after  { border-top: 3px solid var(--green); }
 
   .ba-label {
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 10px;
     letter-spacing: 2px;
     text-transform: uppercase;
@@ -392,7 +392,7 @@
     width: 22px; height: 22px;
     border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 10px;
     flex-shrink: 0;
     margin-top: 1px;
@@ -408,7 +408,7 @@
     padding: 10px 12px;
     border-radius: 4px;
     font-size: 13px;
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'DM Mono', monospace;
   }
 
   .before .ba-result { background: var(--red-dim); color: var(--red); }
@@ -434,7 +434,7 @@
 
   .faq-q {
     padding: 16px 0;
-    font-family: 'Syne', sans-serif;
+    font-family: 'DM Sans', sans-serif;
     font-size: 15px;
     font-weight: 600;
     color: var(--text);
@@ -450,7 +450,7 @@
   .faq-q.open  { color: var(--amber); }
 
   .faq-toggle {
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 14px;
     color: var(--muted);
     flex-shrink: 0;
@@ -484,7 +484,7 @@
   }
 
   .detail-cell-label {
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 10px;
     text-transform: uppercase;
     letter-spacing: 1px;
@@ -500,7 +500,7 @@
 
   /* Inline code */
   code {
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 12px;
     background: var(--card2);
     border: 1px solid var(--border);
@@ -528,14 +528,13 @@
     border-bottom: 1px solid var(--border);
   }
   .ex-nav-logo {
-    font-family: 'Syne', sans-serif;
+    font-family: 'Fraunces', serif;
     font-weight: 700;
-    font-size: 14px;
+    font-size: 18px;
     color: var(--text);
     text-decoration: none;
-    letter-spacing: -0.3px;
+    letter-spacing: -0.5px;
   }
-  .ex-nav-logo span { color: var(--amber); }
   .ex-nav-links {
     display: flex;
     gap: 24px;
@@ -543,7 +542,7 @@
     align-items: center;
   }
   .ex-nav-links a {
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 10px;
     letter-spacing: 1.5px;
     text-transform: uppercase;
@@ -552,24 +551,17 @@
     transition: color 0.15s;
   }
   .ex-nav-links a:hover { color: var(--amber); }
-  .ex-nav-links .nav-back {
-    color: var(--sub);
-    border: 1px solid var(--border);
-    padding: 5px 12px;
-    border-radius: 2px;
-    transition: border-color 0.15s, color 0.15s;
-  }
-  .ex-nav-links .nav-back:hover { border-color: var(--amber); color: var(--amber); }
 
 </style>
 </head>
 <body>
 <nav class="ex-nav" aria-label="Site navigation">
-  <a href="https://abhi630.github.io" class="ex-nav-logo">Abhishek <span>Gawde</span></a>
+  <a href="/" class="ex-nav-logo">Abhishek Gawde</a>
   <ul class="ex-nav-links">
-    <li><a href="https://build-automate-ai-repeat.com">Blog</a></li>
-    <li><a href="https://abhi630.github.io#apps">Apps</a></li>
-    <li><a href="https://abhi630.github.io" class="nav-back">&larr; Home</a></li>
+    <li><a href="/#about">About</a></li>
+    <li><a href="/#apps">Apps</a></li>
+    <li><a href="/#blog">Writing</a></li>
+    <li><a href="https://build-automate-ai-repeat.com" target="_blank">Blog</a></li>
   </ul>
 </nav>
 
