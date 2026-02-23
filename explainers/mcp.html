@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>What Is MCP (Model Context Protocol)? — Interactive Explainer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0c0c0a;
+    --card: #141412;
+    --card2: #1c1c19;
+    --border: #2a2a24;
+    --text: #ede9e0;
+    --sub: #8a8680;
+    --muted: #56534f;
+    --amber: #f5a623;
+    --amber-dim: rgba(245,166,35,0.12);
+    --blue: #5db8f5;
+    --blue-dim: rgba(93,184,245,0.1);
+    --green: #5ecb8a;
+    --green-dim: rgba(94,203,138,0.1);
+    --purple: #a488f0;
+    --purple-dim: rgba(164,136,240,0.1);
+    --red: #e8685a;
+    --red-dim: rgba(232,104,90,0.1);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .explainer {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 48px 24px 64px;
+  }
+
+  /* Header */
+  .ex-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--amber);
+    background: var(--amber-dim);
+    border: 1px solid rgba(245,166,35,0.2);
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 2px;
+    margin-bottom: 16px;
+  }
+
+  .ex-title {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(28px, 5vw, 42px);
+    font-weight: 800;
+    line-height: 1.1;
+    color: var(--text);
+    margin-bottom: 12px;
+    letter-spacing: -0.5px;
+  }
+
+  .ex-subtitle {
+    font-size: 16px;
+    color: var(--sub);
+    max-width: 540px;
+    line-height: 1.65;
+    margin-bottom: 36px;
+  }
+
+  /* Tab Nav */
+  .tab-nav {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+    margin-bottom: 28px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0;
+  }
+
+  .tab-btn {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+    background: none;
+    border: none;
+    padding: 10px 16px;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: color 0.15s, border-color 0.15s;
+    white-space: nowrap;
+  }
+
+  .tab-btn:hover { color: var(--text); }
+  .tab-btn.active { color: var(--amber); border-bottom-color: var(--amber); }
+
+  /* Panels */
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* Cards */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 24px;
+    margin-bottom: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card-accent { padding-top: 28px; }
+  .card-accent::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+  }
+  .card-accent.amber::before { background: var(--amber); }
+  .card-accent.blue::before { background: var(--blue); }
+  .card-accent.green::before { background: var(--green); }
+  .card-accent.purple::before { background: var(--purple); }
+
+  .card-h {
+    font-family: 'Syne', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+
+  .card-p {
+    color: var(--sub);
+    font-size: 14px;
+    line-height: 1.7;
+  }
+
+  .card-p + .card-p { margin-top: 10px; }
+
+  /* Tag */
+  .tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 2px;
+    display: inline-block;
+  }
+
+  .tag.amber { color: var(--amber); background: var(--amber-dim); border: 1px solid rgba(245,166,35,0.2); }
+  .tag.blue   { color: var(--blue);   background: var(--blue-dim);   border: 1px solid rgba(93,184,245,0.2); }
+  .tag.green  { color: var(--green);  background: var(--green-dim);  border: 1px solid rgba(94,203,138,0.2); }
+  .tag.purple { color: var(--purple); background: var(--purple-dim); border: 1px solid rgba(164,136,240,0.2); }
+  .tag.red    { color: var(--red);    background: var(--red-dim);    border: 1px solid rgba(232,104,90,0.2); }
+
+  /* Grid */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 580px) { .grid-2 { grid-template-columns: 1fr; } }
+
+  /* Check / Cross lists */
+  .check-list { list-style: none; display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+  .check-list li {
+    display: flex; gap: 10px; align-items: flex-start;
+    font-size: 14px; color: var(--sub); line-height: 1.5;
+  }
+  .check-list li .icon {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .check-list.good li .icon { color: var(--green); }
+  .check-list.bad  li .icon { color: var(--red); }
+
+  /* Divider */
+  .divider { border: none; border-top: 1px solid var(--border); margin: 8px 0 16px; }
+
+  /* Step row (flow diagram) */
+  .step-row {
+    cursor: pointer;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 16px 20px;
+    margin-bottom: 4px;
+    transition: border-color 0.15s;
+  }
+  .step-row:hover { border-color: var(--muted); }
+  .step-row.open  { border-color: var(--amber); }
+
+  .step-header { display: flex; align-items: center; gap: 12px; }
+
+  .step-num {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    font-weight: 500;
+    flex-shrink: 0;
+    background: var(--card2);
+    border: 1px solid var(--border);
+    color: var(--amber);
+  }
+
+  .step-label {
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+    flex: 1;
+  }
+
+  .step-short { font-size: 13px; color: var(--sub); margin-top: 2px; }
+  .step-toggle { color: var(--muted); font-size: 12px; }
+
+  .step-detail {
+    display: none;
+    margin-top: 14px;
+    padding: 14px;
+    background: var(--card2);
+    border-radius: 4px;
+    border-left: 3px solid var(--amber);
+  }
+  .step-detail.open { display: block; }
+
+  .step-detail-code {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--amber);
+    margin-bottom: 8px;
+  }
+
+  .step-detail p { font-size: 13.5px; color: var(--sub); line-height: 1.7; }
+
+  .arrow-down {
+    text-align: center;
+    color: var(--muted);
+    font-size: 18px;
+    padding: 2px 0 2px;
+    user-select: none;
+  }
+
+  /* Architecture diagram */
+  .arch-diagram {
+    position: relative;
+    padding: 32px 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+
+  .arch-hub {
+    background: var(--amber-dim);
+    border: 2px solid var(--amber);
+    border-radius: 8px;
+    padding: 16px 32px;
+    text-align: center;
+    position: relative;
+    z-index: 2;
+  }
+
+  .arch-hub-label {
+    font-family: 'Syne', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--amber);
+  }
+
+  .arch-hub-sub {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--sub);
+    margin-top: 2px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .arch-connector {
+    width: 2px;
+    height: 32px;
+    background: var(--border);
+    margin: 0 auto;
+  }
+
+  .arch-protocol {
+    background: var(--card2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 8px 20px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--sub);
+    letter-spacing: 1px;
+    text-align: center;
+  }
+
+  .arch-servers {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 32px;
+    padding-top: 32px;
+    position: relative;
+    width: 100%;
+  }
+
+  .arch-servers::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 2px;
+    height: 32px;
+    background: var(--border);
+  }
+
+  .arch-server {
+    background: var(--card2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 12px 16px;
+    text-align: center;
+    min-width: 100px;
+    transition: border-color 0.15s;
+  }
+
+  .arch-server:hover { border-color: var(--blue); }
+
+  .arch-server-icon { font-size: 20px; margin-bottom: 4px; }
+
+  .arch-server-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .arch-server-desc {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 2px;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  /* Before / After */
+  .ba-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  @media (max-width: 560px) { .ba-grid { grid-template-columns: 1fr; } }
+
+  .ba-side {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 20px;
+  }
+
+  .ba-side.before { border-top: 3px solid var(--red); }
+  .ba-side.after  { border-top: 3px solid var(--green); }
+
+  .ba-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+  .before .ba-label { color: var(--red); }
+  .after  .ba-label { color: var(--green); }
+
+  .ba-step {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    margin-bottom: 10px;
+  }
+
+  .ba-step-num {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .before .ba-step-num { background: var(--red-dim); color: var(--red); border: 1px solid rgba(232,104,90,0.2); }
+  .after  .ba-step-num { background: var(--green-dim); color: var(--green); border: 1px solid rgba(94,203,138,0.2); }
+
+  .ba-step-text { font-size: 13.5px; color: var(--sub); line-height: 1.5; }
+
+  .ba-result {
+    margin-top: 14px;
+    padding: 10px 12px;
+    border-radius: 4px;
+    font-size: 13px;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  .before .ba-result { background: var(--red-dim); color: var(--red); }
+  .after  .ba-result { background: var(--green-dim); color: var(--green); }
+
+  /* Insight callout */
+  .callout {
+    background: var(--amber-dim);
+    border: 1px solid rgba(245,166,35,0.25);
+    border-radius: 6px;
+    padding: 16px 20px;
+    margin-bottom: 16px;
+  }
+  .callout .tag { margin-bottom: 10px; }
+  .callout p { font-size: 14px; color: var(--sub); line-height: 1.7; }
+  .callout strong { color: var(--text); }
+
+  /* FAQ */
+  .faq-item {
+    border-bottom: 1px solid var(--border);
+  }
+  .faq-item:first-child { border-top: 1px solid var(--border); }
+
+  .faq-q {
+    padding: 16px 0;
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    user-select: none;
+  }
+
+  .faq-q:hover { color: var(--amber); }
+  .faq-q.open  { color: var(--amber); }
+
+  .faq-toggle {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 14px;
+    color: var(--muted);
+    flex-shrink: 0;
+    transition: transform 0.2s;
+  }
+  .faq-q.open .faq-toggle { transform: rotate(45deg); }
+
+  .faq-a {
+    display: none;
+    padding: 0 0 16px;
+    font-size: 14px;
+    color: var(--sub);
+    line-height: 1.75;
+  }
+  .faq-a.open { display: block; }
+
+  /* Detail grid */
+  .detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 16px;
+  }
+  @media (max-width: 560px) { .detail-grid { grid-template-columns: 1fr; } }
+
+  .detail-cell {
+    background: var(--card2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 12px;
+  }
+
+  .detail-cell-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--amber);
+    margin-bottom: 4px;
+  }
+
+  .detail-cell-val {
+    font-size: 13px;
+    color: var(--sub);
+    line-height: 1.6;
+  }
+
+  /* Inline code */
+  code {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    background: var(--card2);
+    border: 1px solid var(--border);
+    padding: 1px 6px;
+    border-radius: 3px;
+    color: var(--amber);
+  }
+
+  /* Spacer */
+  .mt { margin-top: 12px; }
+  .mt2 { margin-top: 8px; }
+
+</style>
+</head>
+<body>
+<article class="explainer">
+
+  <!-- Header -->
+  <header>
+    <div class="ex-label">Interactive Explainer</div>
+    <h1 class="ex-title">What Is MCP<br>(Model Context Protocol)?</h1>
+    <p class="ex-subtitle">The open standard that lets AI tools read live data from your apps — without copy-pasting. How it works, why every platform is adopting it, and what it means for automation.</p>
+  </header>
+
+  <!-- Tabs -->
+  <nav class="tab-nav" role="tablist" aria-label="MCP Explainer Sections">
+    <button class="tab-btn active" data-tab="problem"    role="tab" aria-selected="true">The Problem</button>
+    <button class="tab-btn"        data-tab="works"      role="tab" aria-selected="false">How It Works</button>
+    <button class="tab-btn"        data-tab="arch"       role="tab" aria-selected="false">Architecture</button>
+    <button class="tab-btn"        data-tab="beforeafter" role="tab" aria-selected="false">Before & After</button>
+    <button class="tab-btn"        data-tab="faq"        role="tab" aria-selected="false">FAQ</button>
+  </nav>
+
+  <!-- ─── Panel 1: The Problem ─── -->
+  <section class="tab-panel active" id="tab-problem" role="tabpanel">
+
+    <div class="card card-accent amber">
+      <h2 class="card-h">Every AI Tool Is an Island</h2>
+      <p class="card-p">Before MCP, connecting an AI to a data source — Notion, GitHub, a database — required a custom integration. Every tool, every connection, built from scratch. The problem wasn't the AI. It was the plumbing.</p>
+      <p class="card-p">The result: AI assistants could only see what you pasted into the chat window. A 90-minute workflow became: open the tool, copy the content, switch to AI, paste it, describe the context, ask the question. Then do it again.</p>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <span class="tag red">Without MCP</span>
+        <ul class="check-list bad" style="margin-top:14px">
+          <li><span class="icon">✗</span> Each AI tool needs a bespoke connector per data source</li>
+          <li><span class="icon">✗</span> You manually copy-paste context into every session</li>
+          <li><span class="icon">✗</span> Data is stale the moment you paste it</li>
+          <li><span class="icon">✗</span> Adding a new tool means rebuilding all integrations</li>
+          <li><span class="icon">✗</span> No shared standard means fragmented ecosystems</li>
+        </ul>
+      </div>
+      <div class="card">
+        <span class="tag green">With MCP</span>
+        <ul class="check-list good" style="margin-top:14px">
+          <li><span class="icon">✓</span> Build one server, connect it to any MCP-compatible AI</li>
+          <li><span class="icon">✓</span> AI reads live data directly, no manual pasting</li>
+          <li><span class="icon">✓</span> Data is current at the moment of the query</li>
+          <li><span class="icon">✓</span> New AI tool? Your existing servers connect automatically</li>
+          <li><span class="icon">✓</span> Open standard backed by Anthropic, OpenAI, Microsoft, Google</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout">
+      <span class="tag amber">Key Insight</span>
+      <p>MCP is to AI tools what USB was to hardware. Before USB, every peripheral needed a proprietary connector. After USB, you plug anything into anything. MCP is building that same universal interface layer for AI and data sources.</p>
+    </div>
+
+    <div class="card">
+      <h3 class="card-h" style="font-size:16px">Why It Launched in November 2024</h3>
+      <p class="card-p">Anthropic published the MCP specification as an open standard in November 2024. By December 2025, governance moved to the Linux Foundation — the same body that oversees Kubernetes and Node.js. As of early 2026, there are over 10,000 active MCP servers available. OpenAI, Google, Microsoft, and AWS have all announced native support.</p>
+      <p class="card-p mt">This is not a Claude-specific feature. It is a cross-industry standard for how AI connects to the world.</p>
+    </div>
+
+  </section>
+
+  <!-- ─── Panel 2: How It Works ─── -->
+  <section class="tab-panel" id="tab-works" role="tabpanel">
+
+    <div class="card card-accent amber">
+      <h2 class="card-h">Three Moving Parts</h2>
+      <p class="card-p">MCP has a simple three-layer structure. Click each step to see what happens inside.</p>
+    </div>
+
+    <!-- Step 1 -->
+    <div class="step-row" data-step="1">
+      <div class="step-header">
+        <div class="step-num">01</div>
+        <div>
+          <div class="step-label">MCP Host — the AI you're talking to</div>
+          <div class="step-short">Claude, Cursor, Windsurf, or any MCP-compatible AI application</div>
+        </div>
+        <div class="step-toggle">▼</div>
+      </div>
+      <div class="step-detail">
+        <div class="step-detail-code">Role: initiates requests, surfaces results to the user</div>
+        <p>The host is the AI tool you interact with — Claude.ai, Claude Code, a VS Code extension, or a custom app built on the API. It contains an MCP client that knows how to speak the MCP protocol. When you ask a question, the host decides which MCP servers to consult and sends requests to them. It then receives the results and folds them into its response to you.</p>
+      </div>
+    </div>
+    <div class="arrow-down">↓</div>
+
+    <!-- Step 2 -->
+    <div class="step-row" data-step="2">
+      <div class="step-header">
+        <div class="step-num">02</div>
+        <div>
+          <div class="step-label">MCP Protocol — the shared language</div>
+          <div class="step-short">JSON-RPC messages over stdio or HTTP/SSE — the standard both sides speak</div>
+        </div>
+        <div class="step-toggle">▼</div>
+      </div>
+      <div class="step-detail">
+        <div class="step-detail-code">Role: defines the message format so any host can talk to any server</div>
+        <p>The protocol is the agreement. It defines exactly how a host asks a server "what can you do?" and how the server responds with a list of tools, resources, and prompts. It defines how a host says "run this function with these parameters" and how the server returns results. Because both sides follow the same spec, a server built once works with every host — Claude, Cursor, or anything else that implements MCP.</p>
+      </div>
+    </div>
+    <div class="arrow-down">↓</div>
+
+    <!-- Step 3 -->
+    <div class="step-row" data-step="3">
+      <div class="step-header">
+        <div class="step-num">03</div>
+        <div>
+          <div class="step-label">MCP Server — your data, made readable</div>
+          <div class="step-short">Notion, GitHub, your database, your files — each server exposes what it knows</div>
+        </div>
+        <div class="step-toggle">▼</div>
+      </div>
+      <div class="step-detail">
+        <div class="step-detail-code">Role: wraps your data source in the MCP interface</div>
+        <p>The server is a lightweight program that sits in front of a data source. It exposes three things: <strong>tools</strong> (functions the AI can call, like "search my notes" or "get file contents"), <strong>resources</strong> (data the AI can read, like the current state of a document), and <strong>prompts</strong> (pre-written instructions the server suggests for common tasks). When the host asks for something, the server fetches live data and returns it in the agreed format.</p>
+      </div>
+    </div>
+
+    <div class="detail-grid" style="margin-top:24px">
+      <div class="detail-cell">
+        <div class="detail-cell-label">What servers expose: Tools</div>
+        <div class="detail-cell-val">Functions the AI can call. Example: <code>search_notes(query)</code>, <code>create_issue(title, body)</code>, <code>query_database(sql)</code></div>
+      </div>
+      <div class="detail-cell">
+        <div class="detail-cell-label">What servers expose: Resources</div>
+        <div class="detail-cell-val">Live data the AI can read. Example: the current contents of a file, a database row, the state of a project.</div>
+      </div>
+      <div class="detail-cell">
+        <div class="detail-cell-label">What servers expose: Prompts</div>
+        <div class="detail-cell-val">Suggested instructions for common workflows. The server can tell the AI "here's a good way to ask me about commits."</div>
+      </div>
+      <div class="detail-cell">
+        <div class="detail-cell-label">Where servers run</div>
+        <div class="detail-cell-val">Locally on your machine (for desktop apps) or remotely via HTTP for cloud-hosted tools. Both work with the same protocol.</div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ─── Panel 3: Architecture ─── -->
+  <section class="tab-panel" id="tab-arch" role="tabpanel">
+
+    <div class="card card-accent blue">
+      <h2 class="card-h">Hub-and-Spoke Architecture</h2>
+      <p class="card-p">One AI host. Multiple MCP servers. Each server built once, works everywhere. The AI decides which server to call based on what you're asking.</p>
+    </div>
+
+    <div class="card">
+      <div class="arch-diagram" aria-label="Architecture diagram: Claude as central hub connecting to Notion, GitHub, Google Drive, Slack, and a custom database via the MCP protocol">
+
+        <!-- Hub -->
+        <div class="arch-hub">
+          <div class="arch-hub-label">🤖 Claude / AI Host</div>
+          <div class="arch-hub-sub">MCP Client — initiates requests</div>
+        </div>
+
+        <!-- Connector down to protocol -->
+        <div class="arch-connector"></div>
+
+        <!-- Protocol label -->
+        <div class="arch-protocol">MCP Protocol · JSON-RPC · Live Connection</div>
+
+        <!-- Servers row -->
+        <div class="arch-servers" role="list" aria-label="MCP Servers">
+          <div class="arch-server" role="listitem">
+            <div class="arch-server-icon">📝</div>
+            <div class="arch-server-name">Notion</div>
+            <div class="arch-server-desc">pages · databases</div>
+          </div>
+          <div class="arch-server" role="listitem">
+            <div class="arch-server-icon">🐙</div>
+            <div class="arch-server-name">GitHub</div>
+            <div class="arch-server-desc">repos · issues · PRs</div>
+          </div>
+          <div class="arch-server" role="listitem">
+            <div class="arch-server-icon">📁</div>
+            <div class="arch-server-name">Google Drive</div>
+            <div class="arch-server-desc">docs · sheets</div>
+          </div>
+          <div class="arch-server" role="listitem">
+            <div class="arch-server-icon">💬</div>
+            <div class="arch-server-name">Slack</div>
+            <div class="arch-server-desc">channels · messages</div>
+          </div>
+          <div class="arch-server" role="listitem">
+            <div class="arch-server-icon">🗄️</div>
+            <div class="arch-server-name">Database</div>
+            <div class="arch-server-desc">custom · any SQL</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <span class="tag blue">Key Property</span>
+        <h3 class="card-h" style="font-size:15px; margin-top:10px">Write Once, Connect Everywhere</h3>
+        <p class="card-p">A Notion MCP server built today works with Claude, Cursor, Windsurf, and any future MCP-compatible AI. You never rebuild the integration. The standard handles compatibility.</p>
+      </div>
+      <div class="card">
+        <span class="tag green">Key Property</span>
+        <h3 class="card-h" style="font-size:15px; margin-top:10px">Live Data, Not Snapshots</h3>
+        <p class="card-p">Every query fetches current data from the source. Unlike context you paste into a chat (which is immediately stale), MCP gives the AI a live window into your systems.</p>
+      </div>
+    </div>
+
+    <div class="callout">
+      <span class="tag amber">What This Enables</span>
+      <p>An AI that can see your Notion project notes, the open GitHub issues, and your Google Sheet of metrics — all at once, all live — without you doing anything except connecting the servers once. That's the practical consequence of the architecture above.</p>
+    </div>
+
+  </section>
+
+  <!-- ─── Panel 4: Before & After ─── -->
+  <section class="tab-panel" id="tab-beforeafter" role="tabpanel">
+
+    <div class="card card-accent amber">
+      <h2 class="card-h">The Same Task, Two Worlds</h2>
+      <p class="card-p">Goal: ask your AI to find the latest notes on a project and check if any GitHub issues are blocking it.</p>
+    </div>
+
+    <div class="ba-grid">
+      <!-- Before -->
+      <div class="ba-side before">
+        <div class="ba-label">Before MCP</div>
+
+        <div class="ba-step">
+          <div class="ba-step-num">1</div>
+          <div class="ba-step-text">Open Notion. Find the project page. Select and copy all the relevant notes.</div>
+        </div>
+        <div class="ba-step">
+          <div class="ba-step-num">2</div>
+          <div class="ba-step-text">Open GitHub. Filter issues for this project. Copy the open ones.</div>
+        </div>
+        <div class="ba-step">
+          <div class="ba-step-num">3</div>
+          <div class="ba-step-text">Switch to your AI tool. Start a new conversation. Paste both chunks of content. Describe what each is.</div>
+        </div>
+        <div class="ba-step">
+          <div class="ba-step-num">4</div>
+          <div class="ba-step-text">Ask your question. Receive an answer based on data that's already slightly out of date.</div>
+        </div>
+
+        <div class="ba-result">4 manual steps · stale data · 5–10 minutes</div>
+      </div>
+
+      <!-- After -->
+      <div class="ba-side after">
+        <div class="ba-label">With MCP</div>
+
+        <div class="ba-step">
+          <div class="ba-step-num">1</div>
+          <div class="ba-step-text">Connect Notion and GitHub MCP servers once in your AI tool's settings.</div>
+        </div>
+        <div class="ba-step">
+          <div class="ba-step-num">2</div>
+          <div class="ba-step-text">Ask: "Check the project notes in Notion and tell me if any open GitHub issues are blocking us."</div>
+        </div>
+        <div class="ba-step">
+          <div class="ba-step-num">3</div>
+          <div class="ba-step-text">The AI queries both servers live. Reads current notes. Reads current issues. Synthesises an answer.</div>
+        </div>
+
+        <div class="ba-result">1 setup · live data · 30 seconds</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 class="card-h" style="font-size:16px">The Compounding Effect</h3>
+      <p class="card-p">The before/after above is for one task. In practice, your work spans dozens of tools: project management, code, documents, communication, databases. MCP doesn't save 10 minutes once. It removes the copy-paste layer from every AI interaction, permanently. That's why the ecosystem is growing fast — the more servers exist, the more useful every MCP-compatible AI becomes.</p>
+    </div>
+
+  </section>
+
+  <!-- ─── Panel 5: FAQ ─── -->
+  <section class="tab-panel" id="tab-faq" role="tabpanel">
+
+    <div class="card card-accent purple">
+      <h2 class="card-h">Common Questions</h2>
+      <p class="card-p">Things people get wrong about MCP, answered directly.</p>
+    </div>
+
+    <div class="card" style="padding: 8px 24px">
+      <div class="faq-item">
+        <div class="faq-q" data-faq="1">
+          Is MCP only for Claude?
+          <span class="faq-toggle">+</span>
+        </div>
+        <div class="faq-a" id="faq-1">
+          No. MCP is an open standard published by Anthropic in November 2024 but governed independently since December 2025 by the Linux Foundation. OpenAI has added native MCP support. Google, Microsoft, and AWS have all announced compatibility. Any AI tool can implement MCP. Any server you build works across all of them.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q" data-faq="2">
+          Do I need to be a developer to use MCP?
+          <span class="faq-toggle">+</span>
+        </div>
+        <div class="faq-a" id="faq-2">
+          To use existing MCP servers — no. Many tools like Claude.ai let you add pre-built servers through settings with no code at all. To build a custom MCP server that exposes your own data or internal tools — yes, that requires development work. Servers can be built in Python, TypeScript, or any language with an MCP SDK available.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q" data-faq="3">
+          What's the difference between MCP and an API?
+          <span class="faq-toggle">+</span>
+        </div>
+        <div class="faq-a" id="faq-3">
+          An API defines how two systems talk to each other — typically built for a specific integration. MCP is a meta-standard: it defines how any AI host discovers and calls any server, using a shared protocol. Think of it this way: an API is a custom-built road between two cities. MCP is the highway system — the standard that means any vehicle (AI host) can reach any destination (server) using the same rules.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q" data-faq="4">
+          Is MCP the same as giving the AI internet access?
+          <span class="faq-toggle">+</span>
+        </div>
+        <div class="faq-a" id="faq-4">
+          Not exactly. Web browsing is one thing MCP can enable, but MCP is broader and more controlled. You choose which servers to connect. Each server only exposes what it's designed to expose. You're not giving the AI open internet access — you're giving it structured, permissioned access to specific data sources you control. A Notion MCP server doesn't give the AI access to your email. Each connection is scoped.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q" data-faq="5">
+          What about security? Should I be concerned?
+          <span class="faq-toggle">+</span>
+        </div>
+        <div class="faq-a" id="faq-5">
+          Reasonable concern, worth taking seriously. MCP servers run with whatever permissions you grant them. A poorly written server could expose more data than intended. A compromised server is a risk. The practical steps: use well-maintained, open-source servers where you can review the code; grant minimum necessary permissions; don't connect servers to sensitive systems without understanding what they expose. The security model is like any third-party integration — the standard itself doesn't create risk, implementation does.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q" data-faq="6">
+          How is MCP different from Agent Skills?
+          <span class="faq-toggle">+</span>
+        </div>
+        <div class="faq-a" id="faq-6">
+          MCP and Agent Skills solve adjacent but different problems. MCP is about data access — giving the AI a live connection to external systems. Agent Skills are about workflow knowledge — teaching the AI how to perform multi-step tasks using a set of tools. MCP is the infrastructure layer. Skills sit on top of it. A Skill might use an MCP server to read your Notion data, then use another to write results back to a database. The next post in this series covers exactly when to use which.
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+</article>
+
+<script>
+// Tab switching
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => {
+      b.classList.remove('active');
+      b.setAttribute('aria-selected', 'false');
+    });
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+
+    btn.classList.add('active');
+    btn.setAttribute('aria-selected', 'true');
+    const panel = document.getElementById('tab-' + btn.dataset.tab);
+    if (panel) panel.classList.add('active');
+  });
+});
+
+// Expandable steps
+document.querySelectorAll('.step-row').forEach(row => {
+  row.addEventListener('click', () => {
+    const detail = row.querySelector('.step-detail');
+    const toggle = row.querySelector('.step-toggle');
+    const isOpen = row.classList.contains('open');
+    row.classList.toggle('open', !isOpen);
+    detail.classList.toggle('open', !isOpen);
+    toggle.textContent = isOpen ? '▼' : '▲';
+  });
+});
+
+// FAQ accordion
+document.querySelectorAll('.faq-q').forEach(q => {
+  q.addEventListener('click', () => {
+    const id = q.dataset.faq;
+    const answer = document.getElementById('faq-' + id);
+    const isOpen = q.classList.contains('open');
+
+    document.querySelectorAll('.faq-q').forEach(x => x.classList.remove('open'));
+    document.querySelectorAll('.faq-a').forEach(x => x.classList.remove('open'));
+
+    if (!isOpen) {
+      q.classList.add('open');
+      answer.classList.add('open');
+    }
+  });
+});
+</script>
+</body>
+</html>
