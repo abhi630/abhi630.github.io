@@ -513,10 +513,67 @@
   .mt { margin-top: 12px; }
   .mt2 { margin-top: 8px; }
 
+
+  /* Nav */
+  .ex-nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 14px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(12,12,10,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+  .ex-nav-logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--text);
+    text-decoration: none;
+    letter-spacing: -0.3px;
+  }
+  .ex-nav-logo span { color: var(--amber); }
+  .ex-nav-links {
+    display: flex;
+    gap: 24px;
+    list-style: none;
+    align-items: center;
+  }
+  .ex-nav-links a {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+  .ex-nav-links a:hover { color: var(--amber); }
+  .ex-nav-links .nav-back {
+    color: var(--sub);
+    border: 1px solid var(--border);
+    padding: 5px 12px;
+    border-radius: 2px;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .ex-nav-links .nav-back:hover { border-color: var(--amber); color: var(--amber); }
+
 </style>
 </head>
 <body>
-<article class="explainer">
+<nav class="ex-nav" aria-label="Site navigation">
+  <a href="https://abhi630.github.io" class="ex-nav-logo">Abhishek <span>Gawde</span></a>
+  <ul class="ex-nav-links">
+    <li><a href="https://build-automate-ai-repeat.com">Blog</a></li>
+    <li><a href="https://abhi630.github.io#apps">Apps</a></li>
+    <li><a href="https://abhi630.github.io" class="nav-back">&larr; Home</a></li>
+  </ul>
+</nav>
+
+<article class="explainer" style="padding-top:80px">
 
   <!-- Header -->
   <header>
