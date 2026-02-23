@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Explainers — Abhishek Gawde</title>
+<meta name="description" content="Interactive explainers on AI, automation, and the tools shaping how we build. Plain English, no jargon.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;0,9..144,900;1,9..144,300;1,9..144,700&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/umd/lucide.min.js"></script>
+<style>
+:root {
+  --bg: #f5f2ed;
+  --bg2: #edeae3;
+  --card: #ffffff;
+  --border: #ddd9d0;
+  --text: #1a1814;
+  --sub: #6b6760;
+  --muted: #a09c96;
+  --accent: #c45c3a;
+  --accent-dim: rgba(196,92,58,0.08);
+  --accent-mid: rgba(196,92,58,0.15);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.display{font-family:'Fraunces',serif;font-weight:900;line-height:1.0;letter-spacing:-1.5px}
+.mono{font-family:'DM Mono',monospace}
+.container{max-width:1040px;margin:0 auto;padding:0 32px}
+
+/* Nav — identical to home page */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:18px 32px;display:flex;justify-content:space-between;align-items:center;background:rgba(245,242,237,0.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+.nav-logo{font-family:'Fraunces',serif;font-weight:700;font-size:18px;color:var(--text);text-decoration:none;letter-spacing:-0.5px}
+.nav-links{display:flex;gap:32px;list-style:none}
+.nav-links a{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--sub);text-decoration:none;transition:color .15s}
+.nav-links a:hover,.nav-links a.active{color:var(--accent)}
+
+/* Page header */
+.page-header{padding:140px 0 64px;border-bottom:1px solid var(--border)}
+.section-eyebrow{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:12px}
+.page-title{font-size:clamp(40px,6vw,64px);margin-bottom:20px}
+.page-lead{font-size:17px;color:var(--sub);font-weight:300;line-height:1.75;max-width:520px}
+
+/* Explainer grid */
+.explainer-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px;padding:64px 0}
+
+.explainer-card{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:32px 28px;text-decoration:none;display:block;transition:transform .15s,box-shadow .15s,border-color .15s;position:relative;overflow:hidden}
+.explainer-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--accent)}
+.explainer-card:hover{transform:translateY(-3px);box-shadow:0 8px 32px rgba(196,92,58,0.10);border-color:transparent}
+
+.explainer-tag{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--accent);background:var(--accent-dim);border:1px solid var(--accent-mid);padding:3px 8px;border-radius:2px;display:inline-block;margin-bottom:20px}
+.explainer-title{font-family:'Fraunces',serif;font-size:22px;font-weight:700;color:var(--text);margin-bottom:10px;letter-spacing:-0.3px;line-height:1.2}
+.explainer-desc{font-size:14px;color:var(--sub);line-height:1.65;font-weight:300;margin-bottom:20px}
+.explainer-meta{display:flex;align-items:center;justify-content:space-between}
+.explainer-tabs{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--muted)}
+.explainer-arrow{color:var(--border);display:flex;align-items:center;transition:color .15s,transform .15s}
+.explainer-card:hover .explainer-arrow{color:var(--accent);transform:translate(2px,-2px)}
+
+/* Footer */
+footer{padding:48px 0;border-top:1px solid var(--border)}
+.footer-grid{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:24px}
+.footer-name{font-family:'Fraunces',serif;font-size:22px;font-weight:700;color:var(--text);letter-spacing:-0.5px}
+.footer-location{display:flex;align-items:center;gap:5px;font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-top:4px}
+.footer-links{display:flex;gap:24px;list-style:none}
+.footer-links a{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--sub);text-decoration:none;transition:color .15s}
+.footer-links a:hover{color:var(--accent)}
+
+@media(max-width:768px){
+  nav{padding:16px 20px}
+  .nav-links{gap:20px}
+  .container{padding:0 20px}
+  .page-header{padding:120px 0 48px}
+  .explainer-grid{padding:48px 0}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-logo">Abhishek Gawde</a>
+  <ul class="nav-links">
+    <li><a href="/#about">About</a></li>
+    <li><a href="/#apps">Apps</a></li>
+    <li><a href="/#blog">Writing</a></li>
+    <li><a href="/explainers/" class="active">Explainers</a></li>
+    <li><a href="https://build-automate-ai-repeat.com" target="_blank">Blog</a></li>
+  </ul>
+</nav>
+
+<div class="page-header">
+  <div class="container">
+    <div class="section-eyebrow">Explainers</div>
+    <h1 class="display page-title">Hard things,<br>plain English.</h1>
+    <p class="page-lead">Interactive guides to the AI concepts and tools that matter. Built to be read here, not linked to somewhere else.</p>
+  </div>
+</div>
+
+<div class="container">
+  <div class="explainer-grid">
+
+    <a href="/explainers/mcp.html" class="explainer-card">
+      <div class="explainer-tag">Interactive</div>
+      <div class="explainer-title">What Is MCP (Model Context Protocol)?</div>
+      <p class="explainer-desc">The open standard that lets AI tools read live data from your apps — without copy-pasting. How it works, why every platform is adopting it.</p>
+      <div class="explainer-meta">
+        <span class="explainer-tabs">5 sections · Architecture · FAQ</span>
+        <span class="explainer-arrow"><i data-lucide="arrow-up-right" width="16" height="16"></i></span>
+      </div>
+    </a>
+
+    <!-- Add new explainer cards here -->
+
+  </div>
+</div>
+
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-name">Abhishek Gawde</div>
+        <div class="footer-location">
+          <i data-lucide="map-pin" width="12" height="12"></i>
+          Berlin, Germany
+        </div>
+      </div>
+      <ul class="footer-links">
+        <li><a href="https://build-automate-ai-repeat.com" target="_blank">Blog</a></li>
+        <li><a href="https://x.com/Abhishek20499" target="_blank">X</a></li>
+        <li><a href="https://linkedin.com/in/abhishekgawde" target="_blank">LinkedIn</a></li>
+      </ul>
+    </div>
+  </div>
+</footer>
+
+<script>lucide.createIcons();</script>
+</body>
+</html>
