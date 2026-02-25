@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>AI Automation — Visual Explainer</title>
+<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>*{box-sizing:border-box;margin:0;padding:0}body{background:#f8f8f6}</style>
+</head><body><div id="root"></div>
+<script type="text/babel">
+const { useState } = React;
+const C = { bg:"#f8f8f6",card:"#fff",border:"#e5e5e0",text:"#222",sub:"#666",muted:"#999",accent:"#ea580c",blue:"#0891b2",purple:"#7c3aed",green:"#16a34a",amber:"#ca8a04",red:"#dc2626" };
+const font = { heading:"'Space Grotesk', sans-serif", body:"'IBM Plex Sans', sans-serif", mono:"'JetBrains Mono', monospace" };
+const Card = ({ children, style, accent, onClick }) => (
+  <div onClick={onClick} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:4,padding:20,position:"relative",overflow:"hidden",boxShadow:"0 1px 3px rgba(0,0,0,0.04)",cursor:onClick?"pointer":"default",...style}}>
+    {accent && <div style={{position:"absolute",top:0,left:0,right:0,height:3,background:accent}}/>}
+    {children}
+  </div>
+);
+const Tag = ({ color, children }) => <span style={{fontFamily:font.mono,fontSize:11,color,background:`${color}12`,border:`1px solid ${color}30`,padding:"2px 10px",borderRadius:3,letterSpacing:0.5,display:"inline-block"}}>{children}</span>;
+const H3 = ({ children, color }) => <h3 style={{fontFamily:font.heading,fontSize:16,fontWeight:700,color:color||C.text,margin:"0 0 8px"}}>{children}</h3>;
+const P = ({ children, style }) => <p style={{fontFamily:font.body,fontSize:13.5,color:C.sub,lineHeight:1.65,margin:0,...style}}>{children}</p>;
+
+const SPECTRUM = [
+  { level:1, name:"Manual", color:"#94a3b8", desc:"A human performs every step by hand. No automation at all.", example:"Copy-pasting rows from one spreadsheet to another", ai:false },
+  { level:2, name:"Scripted", color:C.blue, desc:"Deterministic code runs the same steps every time — no judgment required.", example:"A cron job that runs a SQL query and emails the result at 9am", ai:false },
+  { level:3, name:"Rule-based AI", color:C.amber, desc:"AI applies learned rules to variable inputs — classification, routing, filtering.", example:"Spam filter, sentiment classifier, intent router in a chatbot", ai:true },
+  { level:4, name:"Generative AI", color:C.accent, desc:"AI produces variable outputs — text, code, decisions — given variable inputs.", example:"Draft customer reply, write a report section, generate SQL from natural language", ai:true },
+  { level:5, name:"Agentic AI", color:C.purple, desc:"AI takes multi-step actions, uses tools, loops until a goal is reached — with minimal human direction.", example:"Research a topic, write a briefing, send it to stakeholders — all in one run", ai:true },
+];
+
+const TASKS = [
+  { id:"docs", label:"Document Work", color:C.blue,
+    before:["Manually summarise each PDF","Copy-paste highlights into a doc","Spend 2h compiling a briefing"],
+    after:["Agent reads all PDFs","Extracts key points automatically","Briefing ready in 3 minutes"],
+    tool:"Cowork + PDF skill" },
+  { id:"content", label:"Content", color:C.purple,
+    before:["Write each post from scratch","Adapt tone manually per platform","One piece takes half a day"],
+    after:["One brief → multiple formats","Platform tone applied automatically","Week of content in 30 minutes"],
+    tool:"Cowork + content skills" },
+  { id:"data", label:"Data Pipelines", color:C.amber,
+    before:["Pull CSVs manually","Clean and format by hand","Build charts in Excel one by one"],
+    after:["Agent pulls, cleans, and charts","Anomalies flagged automatically","Runs daily without human involvement"],
+    tool:"Agent + code execution" },
+  { id:"research", label:"Research", color:C.green,
+    before:["Manually search and read sources","Take notes and synthesise by hand","Hours per topic"],
+    after:["Agent searches, reads, extracts","Synthesises across sources","Structured output in minutes"],
+    tool:"Agent + web search + RAG" },
+];
+
+const PRINCIPLES = [
+  { title:"Automate the repeatable", detail:"If a task follows the same steps every time and quality is measurable, it's a good automation candidate. If every instance requires fresh judgment, it's not.", color:C.blue },
+  { title:"Start with output, not process", detail:"Don't try to replicate how a human does a task. Define what a good output looks like, and let the AI find a route to it.", color:C.purple },
+  { title:"Keep a human in the loop for consequences", detail:"Any automation that sends emails, modifies files, or makes purchases should have a human review step unless the stakes are very low.", color:C.amber },
+  { title:"Measure quality explicitly", detail:"Automate only what you can evaluate. If you can't tell whether the output is good, you can't trust the automation.", color:C.green },
+  { title:"Build the simplest thing first", detail:"Start with a prompt and a manual trigger. Add scheduling, tools, and error handling only when you've validated the core output.", color:C.accent },
+];
+
+function SectionSpectrum() {
+  const [active, setActive] = useState(3);
+  const s = SPECTRUM[active];
+  return (
+    <div style={{display:"flex",flexDirection:"column",gap:16}}>
+      <P style={{marginBottom:4}}>Automation exists on a spectrum. Click a level to explore it.</P>
+      <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
+        {SPECTRUM.map((sp,i) => (
+          <button key={i} onClick={() => setActive(i)} style={{fontFamily:font.mono,fontSize:11,fontWeight:active===i?600:400,color:active===i?"#fff":sp.color,background:active===i?sp.color:`${sp.color}12`,border:`1px solid ${sp.color}30`,borderRadius:3,padding:"5px 14px",cursor:"pointer",transition:"all 0.2s"}}>L{sp.level}: {sp.name}</button>
+        ))}
+      </div>
+      <Card accent={s.color} style={{border:`2px solid ${s.color}30`}}>
+        <div style={{paddingTop:8}}>
+          <div style={{display:"flex",gap:10,alignItems:"center",marginBottom:10}}>
+            <Tag color={s.color}>LEVEL {s.level}</Tag>
+            <H3 color={s.color}>{s.name}</H3>
+            {s.ai && <Tag color={C.green}>AI-powered</Tag>}
+          </div>
+          <P style={{marginBottom:12}}>{s.desc}</P>
+          <div style={{padding:12,background:`${s.color}05`,border:`1px solid ${s.color}15`,borderRadius:4}}>
+            <div style={{fontFamily:font.mono,fontSize:10,color:s.color,textTransform:"uppercase",letterSpacing:1,marginBottom:6}}>EXAMPLE</div>
+            <P style={{fontSize:12.5,fontStyle:"italic"}}>"{s.example}"</P>
+          </div>
+        </div>
+      </Card>
+      <Card style={{background:`${C.purple}06`,border:`1px solid ${C.purple}20`}}>
+        <Tag color={C.purple}>KEY INSIGHT</Tag>
+        <P style={{marginTop:8}}>Most organisations live at L1-L2. The jump to L4-L5 (generative + agentic) is where 10x productivity gains become available — but also where design and oversight matter most.</P>
+      </Card>
+    </div>
+  );
+}
+
+function SectionBeforeAfter() {
+  const [active, setActive] = useState(0);
+  const task = TASKS[active];
+  return (
+    <div style={{display:"flex",flexDirection:"column",gap:16}}>
+      <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+        {TASKS.map((t,i) => (<button key={i} onClick={() => setActive(i)} style={{fontFamily:font.heading,fontSize:12,fontWeight:active===i?700:500,color:active===i?t.color:C.sub,background:active===i?`${t.color}08`:"transparent",border:`1px solid ${active===i?`${t.color}30`:"transparent"}`,borderRadius:4,padding:"8px 14px",cursor:"pointer",transition:"all 0.2s"}}>{t.label}</button>))}
+      </div>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16}}>
+        <Card>
+          <H3 color={C.red}>Before automation</H3>
+          {task.before.map((b,i) => (
+            <div key={i} style={{display:"flex",gap:10,padding:"8px 0",borderBottom:i<task.before.length-1?`1px solid ${C.border}`:"none"}}>
+              <span style={{fontFamily:font.mono,fontSize:11,color:C.red,flexShrink:0}}>✗</span>
+              <P style={{fontSize:12.5}}>{b}</P>
+            </div>
+          ))}
+        </Card>
+        <Card accent={task.color}>
+          <div style={{paddingTop:8}}>
+          <H3 color={task.color}>After automation</H3>
+          {task.after.map((a,i) => (
+            <div key={i} style={{display:"flex",gap:10,padding:"8px 0",borderBottom:i<task.after.length-1?`1px solid ${C.border}`:"none"}}>
+              <span style={{fontFamily:font.mono,fontSize:11,color:task.color,flexShrink:0}}>✓</span>
+              <P style={{fontSize:12.5}}>{a}</P>
+            </div>
+          ))}
+          <div style={{marginTop:12,padding:8,background:`${task.color}08`,borderRadius:3}}>
+            <span style={{fontFamily:font.mono,fontSize:10,color:task.color,letterSpacing:1}}>TOOL: </span>
+            <span style={{fontFamily:font.mono,fontSize:10,color:C.muted}}>{task.tool}</span>
+          </div>
+          </div>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
+function SectionPrinciples() {
+  const [open, setOpen] = useState(null);
+  return (
+    <div style={{display:"flex",flexDirection:"column",gap:12}}>
+      <P style={{marginBottom:4}}>Five principles for building automations that actually work and stay safe.</P>
+      {PRINCIPLES.map((p,i) => (
+        <Card key={i} onClick={() => setOpen(open===i?null:i)}
+          style={{border:open===i?`2px solid ${p.color}`:`1px solid ${C.border}`,padding:open===i?"16px 19px":20,transition:"all 0.2s"}}>
+          <div style={{display:"flex",alignItems:"center",gap:12}}>
+            <div style={{width:24,height:24,borderRadius:4,background:`${p.color}15`,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:font.mono,fontSize:11,color:p.color,fontWeight:600,flexShrink:0}}>{i+1}</div>
+            <H3 color={open===i?p.color:C.text}>{p.title}</H3>
+            <span style={{fontFamily:font.mono,fontSize:11,color:C.muted,marginLeft:"auto"}}>{open===i?"▲":"▼"}</span>
+          </div>
+          {open===i && (
+            <div style={{marginTop:10,paddingLeft:36}}>
+              <P>{p.detail}</P>
+            </div>
+          )}
+        </Card>
+      ))}
+    </div>
+  );
+}
+
+export default function AutomationExplainer() {
+  const [tab, setTab] = useState(0);
+  const TABS = ["The Spectrum","Before & After","Principles"];
+  const sections = [<SectionSpectrum/>,<SectionBeforeAfter/>,<SectionPrinciples/>];
+  return (
+    <div style={{background:C.bg,minHeight:"100vh",fontFamily:font.body,color:C.text}}>
+      <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+      <div style={{padding:"32px 24px 0",maxWidth:800,margin:"0 auto"}}>
+        <span style={{fontFamily:font.mono,fontSize:11,color:C.accent,background:`${C.accent}10`,padding:"2px 10px",borderRadius:3,letterSpacing:2,textTransform:"uppercase"}}>Visual Explainer</span>
+        <h1 style={{fontFamily:font.heading,fontSize:30,fontWeight:700,color:C.text,margin:"8px 0 4px",lineHeight:1.2,letterSpacing:-0.5}}>AI Automation</h1>
+        <P>The full spectrum from manual to agentic — what changes before and after AI automation, and how to build it right.</P>
+      </div>
+      <div style={{maxWidth:800,margin:"20px auto 0",padding:"0 24px",display:"flex",gap:4,flexWrap:"wrap"}}>
+        {TABS.map((t,i) => (<button key={i} onClick={() => setTab(i)} style={{fontFamily:font.heading,fontSize:12,fontWeight:tab===i?700:500,color:tab===i?C.accent:C.sub,background:tab===i?`${C.accent}08`:"transparent",border:`1px solid ${tab===i?`${C.accent}30`:"transparent"}`,borderRadius:4,padding:"8px 14px",cursor:"pointer",transition:"all 0.2s"}}>{t}</button>))}
+      </div>
+      <div style={{maxWidth:800,margin:"16px auto 40px",padding:"0 24px"}}>{sections[tab]}</div>
+      <div style={{maxWidth:800,margin:"0 auto",padding:"16px 24px 32px",borderTop:`1px solid ${C.border}`}}>
+        <P style={{fontSize:11,color:C.muted,textAlign:"center"}}><a href="semantics.html" style={{color:C.accent,textDecoration:"none"}}>← Semantics</a> · <a href="index.html" style={{color:C.accent,textDecoration:"none"}}>AI Concepts Series</a> · <a href="claude.html" style={{color:C.accent,textDecoration:"none"}}>Start over: Claude →</a></P>
+      </div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<AutomationExplainer/>);
+</script></body></html>

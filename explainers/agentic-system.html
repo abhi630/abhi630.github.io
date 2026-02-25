@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>What is an Agentic System? — Visual Explainer</title>
+<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>*{box-sizing:border-box;margin:0;padding:0}body{background:#f8f8f6}</style>
+</head><body><div id="root"></div>
+<script type="text/babel">
+const { useState } = React;
+const C = { bg:"#f8f8f6",card:"#fff",border:"#e5e5e0",text:"#222",sub:"#666",muted:"#999",accent:"#ea580c",blue:"#0891b2",purple:"#7c3aed",green:"#16a34a",amber:"#ca8a04",red:"#dc2626" };
+const font = { heading:"'Space Grotesk', sans-serif", body:"'IBM Plex Sans', sans-serif", mono:"'JetBrains Mono', monospace" };
+const LEVEL_COLORS = { 0:"#94a3b8", 1:"#0891b2", 2:"#ca8a04", 3:"#ea580c", 4:"#dc2626", 5:"#7c3aed" };
+const Card = ({ children, style, accent, onClick }) => (
+  <div onClick={onClick} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:4,padding:20,position:"relative",overflow:"hidden",boxShadow:"0 1px 3px rgba(0,0,0,0.04)",cursor:onClick?"pointer":"default",...style}}>
+    {accent && <div style={{position:"absolute",top:0,left:0,right:0,height:3,background:accent}}/>}
+    {children}
+  </div>
+);
+const Tag = ({ color, children }) => <span style={{fontFamily:font.mono,fontSize:11,color,background:`${color}12`,border:`1px solid ${color}30`,padding:"2px 10px",borderRadius:3,letterSpacing:0.5,display:"inline-block"}}>{children}</span>;
+const H3 = ({ children, color }) => <h3 style={{fontFamily:font.heading,fontSize:16,fontWeight:700,color:color||C.text,margin:"0 0 8px"}}>{children}</h3>;
+const P = ({ children, style }) => <p style={{fontFamily:font.body,fontSize:13.5,color:C.sub,lineHeight:1.65,margin:0,...style}}>{children}</p>;
+
+const LEVELS = [
+  { level:0, name:"Simple Responder", color:LEVEL_COLORS[0], desc:"A model that responds to a single prompt with no tools, no memory, no follow-up.", example:"'What's the capital of France?' → 'Paris'", autonomy:"None", human:"100% of decisions", risk:"Very Low" },
+  { level:1, name:"Tool-Augmented", color:LEVEL_COLORS[1], desc:"A model that can call a predefined set of tools (search, calculator) within a single response turn.", example:"Weather query → calls weather API → returns current temp", autonomy:"Minimal", human:"All goals set by human", risk:"Low" },
+  { level:2, name:"Workflow Agent", color:LEVEL_COLORS[2], desc:"An agent that executes a multi-step workflow, using tools across several loops to complete a defined task.", example:"'Write me a report on X' → searches, reads, synthesises, formats", autonomy:"Moderate", human:"Human sets goal; agent chooses steps", risk:"Medium" },
+  { level:3, name:"Autonomous Agent", color:LEVEL_COLORS[3], desc:"An agent that can set sub-goals, handle unexpected states, and operate without human check-ins for extended periods.", example:"'Monitor this data feed and alert me if anomaly detected'", autonomy:"High", human:"Human sets objective only", risk:"High" },
+  { level:4, name:"Multi-Agent System", color:LEVEL_COLORS[4], desc:"A network of specialised agents that coordinate — one plans, others execute, one validates — all working toward a shared goal.", example:"Orchestrator agent routes tasks to code agent, research agent, and writer agent", autonomy:"Very High", human:"Human approves final output", risk:"Very High" },
+  { level:5, name:"Self-Improving", color:LEVEL_COLORS[5], desc:"A system that can modify its own prompts, tools, or sub-agents based on performance — learning from outcomes.", example:"Agent notices its research is poor → rewrites its own search instructions", autonomy:"Full", human:"Minimal — oversight only", risk:"Critical" },
+];
+
+const COMPONENTS = [
+  { id:"model", label:"Core Model", color:C.blue, desc:"The LLM at the centre — reasons, plans, generates text, decides which tools to call.", role:"Brain / Reasoner" },
+  { id:"tools", label:"Tool Layer", color:C.purple, desc:"The set of APIs, functions, and capabilities the agent can call — web search, code execution, file I/O.", role:"Hands / Actuators" },
+  { id:"memory", label:"Memory Layer", color:C.amber, desc:"In-context conversation + external retrieval (RAG) + episodic storage for persistence across sessions.", role:"Memory / State" },
+  { id:"orchestrator", label:"Orchestrator", color:C.green, desc:"Logic that decides when to loop, when to stop, how to handle errors, when to ask for human input.", role:"Director / Control flow" },
+  { id:"sandbox", label:"Execution Sandbox", color:C.accent, desc:"An isolated environment where code runs safely — contained from the host system to limit blast radius.", role:"Safety / Containment" },
+];
+
+const RISKS = [
+  { name:"Unintended Actions", color:C.red, level:"High", desc:"An agent with write access can create, overwrite, or delete real files and send real messages. Mistakes have real consequences.", mitigation:"Use read-only tools where possible; require confirmation for writes" },
+  { name:"Prompt Injection", color:C.amber, level:"Medium", desc:"Malicious content in tool outputs (web pages, documents) can hijack agent behaviour by embedding instructions.", mitigation:"Treat all external content as untrusted data; validate before acting" },
+  { name:"Goal Misalignment", color:C.red, level:"High", desc:"The agent optimises for the stated goal in unexpected ways — technically correct but not what the human meant.", mitigation:"Specify constraints, not just objectives; add human review checkpoints" },
+  { name:"Runaway Loops", color:C.amber, level:"Medium", desc:"Without a termination condition, agents can loop indefinitely, consuming resources or performing repeated actions.", mitigation:"Set explicit step limits and timeout conditions" },
+  { name:"Scope Creep", color:C.purple, level:"Medium", desc:"An autonomous agent may access or modify things outside its intended scope when pursuing a goal.", mitigation:"Apply least-privilege: minimum tool access needed for the task" },
+];
+
+function SectionConcept() {
+  return (
+    <div style={{display:"flex",flexDirection:"column",gap:16}}>
+      <Card accent={C.accent}>
+        <div style={{paddingTop:8}}>
+          <Tag color={C.accent}>DEFINITION</Tag>
+          <P style={{marginTop:12,fontSize:15,color:C.text,fontWeight:500,lineHeight:1.7}}>
+            An agentic system is an AI architecture where one or more models perceive their environment, plan actions, use tools, and iterate toward a goal — with varying degrees of autonomy and human involvement.
+          </P>
+        </div>
+      </Card>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16}}>
+        <Card>
+          <H3 color={C.blue}>The Key Property</H3>
+          <P>Agenticity isn't binary — it's a spectrum from a single prompt-response to a fully autonomous multi-agent network. The key variable is how much the system decides for itself.</P>
+        </Card>
+        <Card>
+          <H3 color={C.purple}>Why It Matters Now</H3>
+          <P>As LLMs become more capable, the practical limit on what agents can do expands. What required a human operator in 2022 can now run autonomously at scale.</P>
+        </Card>
+      </div>
+      <Card style={{background:`${C.purple}06`,border:`1px solid ${C.purple}20`}}>
+        <Tag color={C.purple}>KEY INSIGHT</Tag>
+        <P style={{marginTop:8}}>Higher autonomy = higher leverage and higher risk. The design question isn't "how autonomous can we make this?" but "what level of autonomy matches the stakes of this task?"</P>
+      </Card>
+    </div>
+  );
+}
+
+function SectionLevels() {
+  const [active, setActive] = useState(2);
+  const lv = LEVELS[active];
+  return (
+    <div style={{display:"flex",flexDirection:"column",gap:16}}>
+      <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
+        {LEVELS.map((l,i) => (
+          <button key={i} onClick={() => setActive(i)} style={{fontFamily:font.mono,fontSize:11,fontWeight:active===i?600:400,color:active===i?"#fff":l.color,background:active===i?l.color:`${l.color}12`,border:`1px solid ${l.color}30`,borderRadius:3,padding:"5px 12px",cursor:"pointer",transition:"all 0.2s"}}>L{l.level}</button>
+        ))}
+      </div>
+      <Card accent={lv.color} style={{border:`2px solid ${lv.color}30`}}>
+        <div style={{paddingTop:8}}>
+          <div style={{display:"flex",gap:10,alignItems:"center",marginBottom:10}}>
+            <Tag color={lv.color}>LEVEL {lv.level}</Tag>
+            <H3 color={lv.color}>{lv.name}</H3>
+          </div>
+          <P style={{marginBottom:14}}>{lv.desc}</P>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:12}}>
+            {[["EXAMPLE", lv.example, lv.color],["AUTONOMY", lv.autonomy, lv.color],["RISK", lv.risk, lv.risk==="Very Low"||lv.risk==="Low"?C.green:lv.risk==="Medium"?C.amber:C.red]].map(([label,val,col]) => (
+              <div key={label} style={{padding:12,background:`${col}05`,border:`1px solid ${col}15`,borderRadius:4}}>
+                <div style={{fontFamily:font.mono,fontSize:10,color:col,textTransform:"uppercase",letterSpacing:1,marginBottom:6}}>{label}</div>
+                <P style={{fontSize:12}}>{val}</P>
+              </div>
+            ))}
+          </div>
+          <div style={{marginTop:14,display:"flex",alignItems:"center",gap:6}}>
+            <div style={{fontFamily:font.mono,fontSize:10,color:C.muted,letterSpacing:1,textTransform:"uppercase",marginRight:4}}>HUMAN INVOLVEMENT</div>
+            <P style={{fontSize:12,color:lv.color,fontWeight:500}}>{lv.human}</P>
+          </div>
+        </div>
+      </Card>
+    </div>
+  );
+}
+
+function SectionArchitecture() {
+  const [active, setActive] = useState(0);
+  const comp = COMPONENTS[active];
+  return (
+    <div style={{display:"flex",flexDirection:"column",gap:16}}>
+      <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+        {COMPONENTS.map((c,i) => (
+          <button key={i} onClick={() => setActive(i)} style={{fontFamily:font.heading,fontSize:12,fontWeight:active===i?700:500,color:active===i?c.color:C.sub,background:active===i?`${c.color}08`:"transparent",border:`1px solid ${active===i?`${c.color}30`:"transparent"}`,borderRadius:4,padding:"8px 14px",cursor:"pointer",transition:"all 0.2s"}}>{c.label}</button>
+        ))}
+      </div>
+      <Card accent={comp.color} style={{border:`2px solid ${comp.color}30`}}>
+        <div style={{paddingTop:8}}>
+          <Tag color={comp.color}>{comp.label.toUpperCase()}</Tag>
+          <P style={{marginTop:10,marginBottom:12}}>{comp.desc}</P>
+          <div style={{padding:12,background:`${comp.color}05`,border:`1px solid ${comp.color}15`,borderRadius:4}}>
+            <div style={{fontFamily:font.mono,fontSize:10,color:comp.color,textTransform:"uppercase",letterSpacing:1,marginBottom:4}}>ROLE IN SYSTEM</div>
+            <P style={{fontSize:12.5,fontWeight:500,color:comp.color}}>{comp.role}</P>
+          </div>
+        </div>
+      </Card>
+    </div>
+  );
+}
+
+function SectionRisks() {
+  const [open, setOpen] = useState(null);
+  return (
+    <div style={{display:"flex",flexDirection:"column",gap:12}}>
+      <P style={{marginBottom:4}}>The most important risks in agentic systems — and how to address them.</P>
+      {RISKS.map((r,i) => (
+        <Card key={i} onClick={() => setOpen(open===i?null:i)}
+          style={{border:open===i?`2px solid ${r.color}`:`1px solid ${C.border}`,padding:open===i?"16px 19px":20,transition:"all 0.2s"}}>
+          <div style={{display:"flex",alignItems:"center",gap:12}}>
+            <Tag color={r.color}>{r.level}</Tag>
+            <H3 color={open===i?r.color:C.text}>{r.name}</H3>
+            <span style={{fontFamily:font.mono,fontSize:11,color:C.muted,marginLeft:"auto"}}>{open===i?"▲":"▼"}</span>
+          </div>
+          {open===i && (
+            <div style={{marginTop:12,display:"flex",flexDirection:"column",gap:10}}>
+              <P>{r.desc}</P>
+              <div style={{padding:10,background:`${C.green}05`,border:`1px solid ${C.green}15`,borderRadius:4}}>
+                <div style={{fontFamily:font.mono,fontSize:10,color:C.green,textTransform:"uppercase",letterSpacing:1,marginBottom:4}}>MITIGATION</div>
+                <P style={{fontSize:12.5}}>{r.mitigation}</P>
+              </div>
+            </div>
+          )}
+        </Card>
+      ))}
+    </div>
+  );
+}
+
+export default function AgenticExplainer() {
+  const [tab, setTab] = useState(0);
+  const TABS = ["The Concept","Autonomy Levels","Architecture","Risks"];
+  const sections = [<SectionConcept/>,<SectionLevels/>,<SectionArchitecture/>,<SectionRisks/>];
+  return (
+    <div style={{background:C.bg,minHeight:"100vh",fontFamily:font.body,color:C.text}}>
+      <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+      <div style={{padding:"32px 24px 0",maxWidth:800,margin:"0 auto"}}>
+        <span style={{fontFamily:font.mono,fontSize:11,color:C.accent,background:`${C.accent}10`,padding:"2px 10px",borderRadius:3,letterSpacing:2,textTransform:"uppercase"}}>Visual Explainer</span>
+        <h1 style={{fontFamily:font.heading,fontSize:30,fontWeight:700,color:C.text,margin:"8px 0 4px",lineHeight:1.2,letterSpacing:-0.5}}>What is an Agentic System?</h1>
+        <P>The full spectrum of AI autonomy — from single-turn responses to self-directing networks — and how to design them safely.</P>
+      </div>
+      <div style={{maxWidth:800,margin:"20px auto 0",padding:"0 24px",display:"flex",gap:4,flexWrap:"wrap"}}>
+        {TABS.map((t,i) => (<button key={i} onClick={() => setTab(i)} style={{fontFamily:font.heading,fontSize:12,fontWeight:tab===i?700:500,color:tab===i?C.accent:C.sub,background:tab===i?`${C.accent}08`:"transparent",border:`1px solid ${tab===i?`${C.accent}30`:"transparent"}`,borderRadius:4,padding:"8px 14px",cursor:"pointer",transition:"all 0.2s"}}>{t}</button>))}
+      </div>
+      <div style={{maxWidth:800,margin:"16px auto 40px",padding:"0 24px"}}>{sections[tab]}</div>
+      <div style={{maxWidth:800,margin:"0 auto",padding:"16px 24px 32px",borderTop:`1px solid ${C.border}`}}>
+        <P style={{fontSize:11,color:C.muted,textAlign:"center"}}><a href="ai-memory.html" style={{color:C.accent,textDecoration:"none"}}>← AI Memory</a> · <a href="index.html" style={{color:C.accent,textDecoration:"none"}}>AI Concepts Series</a> · <a href="semantics.html" style={{color:C.accent,textDecoration:"none"}}>Semantics →</a></P>
+      </div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<AgenticExplainer/>);
+</script></body></html>

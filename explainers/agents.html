@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>What are AI Agents? — Visual Explainer</title>
+<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>*{box-sizing:border-box;margin:0;padding:0}body{background:#f8f8f6}</style>
+</head><body><div id="root"></div>
+<script type="text/babel">
+const { useState } = React;
+const C = { bg:"#f8f8f6",card:"#fff",border:"#e5e5e0",text:"#222",sub:"#666",muted:"#999",accent:"#ea580c",blue:"#0891b2",purple:"#7c3aed",green:"#16a34a",amber:"#ca8a04",red:"#dc2626" };
+const font = { heading:"'Space Grotesk', sans-serif", body:"'IBM Plex Sans', sans-serif", mono:"'JetBrains Mono', monospace" };
+const Card = ({ children, style, accent, onClick }) => (
+  <div onClick={onClick} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:4,padding:20,position:"relative",overflow:"hidden",boxShadow:"0 1px 3px rgba(0,0,0,0.04)",cursor:onClick?"pointer":"default",...style}}>
+    {accent && <div style={{position:"absolute",top:0,left:0,right:0,height:3,background:accent}}/>}
+    {children}
+  </div>
+);
+const Tag = ({ color, children }) => (
+  <span style={{fontFamily:font.mono,fontSize:11,color,background:`${color}12`,border:`1px solid ${color}30`,padding:"2px 10px",borderRadius:3,letterSpacing:0.5,display:"inline-block"}}>{children}</span>
+);
+const H2 = ({ children }) => <h2 style={{fontFamily:font.heading,fontSize:22,fontWeight:700,color:C.text,margin:"0 0 6px"}}>{children}</h2>;
+const H3 = ({ children, color }) => <h3 style={{fontFamily:font.heading,fontSize:16,fontWeight:700,color:color||C.text,margin:"0 0 8px"}}>{children}</h3>;
+const P = ({ children, style }) => <p style={{fontFamily:font.body,fontSize:13.5,color:C.sub,lineHeight:1.65,margin:0,...style}}>{children}</p>;
+
+const LOOP_STEPS = [
+  { n:1, label:"Perceive", icon:"👁", detail:"The agent reads the goal, the environment, any tool outputs, and prior steps — building a full picture of the current state.", color:C.blue },
+  { n:2, label:"Plan", icon:"🧠", detail:"Using reasoning, the agent decides what action to take next: which tool, what inputs, whether to decompose the task further.", color:C.purple },
+  { n:3, label:"Act", icon:"⚡", detail:"The agent calls a tool or executes a step — browsing the web, writing code, reading a file, or sending a request.", color:C.amber },
+  { n:4, label:"Observe", icon:"📊", detail:"The result comes back. The agent reads it, updates its understanding, and decides whether the task is done or another loop is needed.", color:C.green },
+  { n:5, label:"Done / Loop", icon:"🔄", detail:"If the goal is met, the agent reports back. If not, it loops again — re-planning with the new information from the last action.", color:C.accent },
+];
+
+const TOOLS = [
+  { id:"web", label:"Web Search", color:C.blue, desc:"Browse live web pages, search for current information, read articles and documentation.", uses:["Research tasks","Fact checking","Finding current data"] },
+  { id:"code", label:"Code Execution", color:C.purple, desc:"Write and run code in sandboxed environments — Python, JavaScript, shell scripts.", uses:["Data analysis","File processing","Calculations","Automations"] },
+  { id:"files", label:"File System", color:C.amber, desc:"Read, write, move, and organise files — PDFs, spreadsheets, images, documents.", uses:["Document processing","Report generation","Data extraction"] },
+  { id:"api", label:"External APIs", color:C.green, desc:"Connect to any service with an API — Slack, email, calendar, databases, payment systems.", uses:["Sending messages","Scheduling","CRM updates","Orders"] },
+  { id:"memory", label:"Memory / RAG", color:C.accent, desc:"Retrieve relevant information from a knowledge base or past conversations to inform the current task.", uses:["Personalisation","Long-term context","Knowledge retrieval"] },
+];
+
+const EXAMPLES = [
+  { title:"Market research report", color:C.blue, steps:["Search web for competitor pricing pages","Read and extract pricing tiers from each site","Run code to generate comparison table","Write summary report and export as PDF"], time:"~3 min", saving:"~2 hrs manual" },
+  { title:"Inbox triage & reply drafts", color:C.purple, steps:["Read unread emails from last 24h","Classify each by urgency and topic","Draft reply for each action-needed email","Add flagged items to task list"], time:"~1 min", saving:"~30 min manual" },
+  { title:"Data pipeline & dashboard", color:C.amber, steps:["Pull data from database API","Clean and normalise with Python","Generate charts and summary stats","Update dashboard via API and notify team"], time:"~2 min", saving:"~1 hr manual" },
+];
+
+const CHATBOT_VS = [
+  { dim:"Scope", chatbot:"Answers one question at a time", agent:"Completes multi-step tasks end-to-end" },
+  { dim:"Action", chatbot:"Generates text only", agent:"Executes real actions in the world" },
+  { dim:"Memory", chatbot:"Forgets between turns (often)", agent:"Maintains state across all steps" },
+  { dim:"Tools", chatbot:"No external access", agent:"Uses web, code, files, APIs" },
+  { dim:"Loop", chatbot:"One response per prompt", agent:"Loops until the goal is achieved" },
+  { dim:"Effort", chatbot:"You do the follow-up work", agent:"Handles the follow-up autonomously" },
+];
+
+function SectionConcept() {
+  return (
+    <div style={{display:"flex",flexDirection:"column",gap:16}}>
+      <Card accent={C.accent}>
+        <div style={{paddingTop:8}}>
+          <Tag color={C.accent}>DEFINITION</Tag>
+          <P style={{marginTop:12,fontSize:15,color:C.text,fontWeight:500,lineHeight:1.7}}>
+            An AI agent is an AI that can take actions in the world — not just generate text. It perceives its environment, makes decisions, uses tools, and loops until a goal is accomplished.
+          </P>
+        </div>
+      </Card>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16}}>
+        <Card>
+          <H3 color={C.blue}>The Analogy</H3>
+          <P>A chatbot is like asking someone a question. An AI agent is like hiring an assistant who goes off, does the work — researching, writing, sending — and returns with the finished result.</P>
+        </Card>
+        <Card>
+          <H3 color={C.purple}>The Key Shift</H3>
+          <P>Traditional software follows fixed rules. An agent reasons about what to do next, adapts when things change, and uses judgment — not just instructions — to reach its goal.</P>
+        </Card>
+      </div>
+      <Card style={{background:`${C.purple}06`,border:`1px solid ${C.purple}20`}}>
+        <Tag color={C.purple}>KEY INSIGHT</Tag>
+        <P style={{marginTop:8}}>The agent loop — perceive, plan, act, observe — is the defining pattern. Everything else (tools, memory, multi-agent systems) is built on top of this core loop.</P>
+      </Card>
+    </div>
+  );
+}
+
+function SectionLoop() {
+  const [active, setActive] = useState(null);
+  return (
+    <div style={{display:"flex",flexDirection:"column",gap:12}}>
+      <P style={{marginBottom:4}}>Click any step in the loop to see what's actually happening.</P>
+      {LOOP_STEPS.map((s,i) => (
+        <div key={i}>
+          <Card onClick={() => setActive(active===i?null:i)}
+            accent={active===i?s.color:undefined}
+            style={{border:active===i?`2px solid ${s.color}`:`1px solid ${C.border}`,padding:active===i?"16px 19px":20,transition:"all 0.2s"}}>
+            <div style={{display:"flex",gap:14,alignItems:"center"}}>
+              <div style={{width:38,height:38,borderRadius:4,background:s.color,display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,flexShrink:0}}>{s.icon}</div>
+              <div style={{flex:1}}>
+                <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:4}}>
+                  <span style={{fontFamily:font.mono,fontSize:10,color:s.color,textTransform:"uppercase",letterSpacing:1}}>Step {s.n}</span>
+                  <H3 color={active===i?s.color:C.text}>{s.label}</H3>
+                </div>
+                <P style={{fontSize:12.5}}>{s.detail}</P>
+              </div>
+              <span style={{fontFamily:font.mono,fontSize:11,color:C.muted}}>{active===i?"▲":"▼"}</span>
+            </div>
+            {active===i && (
+              <div style={{marginTop:12,padding:12,background:`${s.color}05`,border:`1px solid ${s.color}15`,borderRadius:4}}>
+                <P style={{fontSize:12.5,color:s.color,fontWeight:500}}>
+                  {i===0 && "Context accumulates with each loop. By step 3, the agent has a rich model of what's been tried, what worked, and what's still needed."}
+                  {i===1 && "Planning quality determines everything. A good agent knows when to ask for clarification, when to simplify a task, and when a sub-agent would be faster."}
+                  {i===2 && "The action is real and consequential — a file gets written, an email gets sent, code gets executed. This is what distinguishes agents from chatbots."}
+                  {i===3 && "Observing isn't just reading output. A skilled agent catches unexpected results, adapts its plan, and decides whether to retry or escalate."}
+                  {i===4 && "Most real tasks take 3–10 loops. Simple tasks (look something up) take 1. Complex tasks (build a report) can take 20+."}
+                </P>
+              </div>
+            )}
+          </Card>
+          {i < LOOP_STEPS.length-1 && (
+            <div style={{textAlign:"center",padding:"4px 0",color:C.muted,fontSize:16}}>↓</div>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function SectionTools() {
+  const [active, setActive] = useState(0);
+  const tool = TOOLS[active];
+  return (
+    <div style={{display:"flex",flexDirection:"column",gap:16}}>
+      <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+        {TOOLS.map((t,i) => (
+          <button key={i} onClick={() => setActive(i)} style={{
+            fontFamily:font.heading,fontSize:12,fontWeight:active===i?700:500,
+            color:active===i?t.color:C.sub,background:active===i?`${t.color}08`:"transparent",
+            border:`1px solid ${active===i?`${t.color}30`:"transparent"}`,
+            borderRadius:4,padding:"8px 14px",cursor:"pointer",transition:"all 0.2s"}}>{t.label}</button>
+        ))}
+      </div>
+      <Card accent={tool.color} style={{border:`2px solid ${tool.color}30`}}>
+        <div style={{paddingTop:8}}>
+          <Tag color={tool.color}>{tool.label.toUpperCase()}</Tag>
+          <P style={{marginTop:10,marginBottom:16}}>{tool.desc}</P>
+          <div style={{fontFamily:font.mono,fontSize:10,color:C.muted,textTransform:"uppercase",letterSpacing:1,marginBottom:10}}>COMMON USES</div>
+          <div style={{display:"flex",flexWrap:"wrap",gap:8}}>
+            {tool.uses.map((u,i) => <Tag key={i} color={tool.color}>{u}</Tag>)}
+          </div>
+        </div>
+      </Card>
+      <Card style={{background:`${C.blue}06`,border:`1px solid ${C.blue}20`}}>
+        <Tag color={C.blue}>HOW TOOLS WORK</Tag>
+        <P style={{marginTop:8}}>The AI doesn't run tools directly — it generates structured calls (function name + parameters). A surrounding system executes those calls and returns results back into the agent's context.</P>
+      </Card>
+    </div>
+  );
+}
+
+function SectionVsChatbot() {
+  return (
+    <div style={{display:"flex",flexDirection:"column",gap:16}}>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16}}>
+        <Card>
+          <H3 color={C.red}>Chatbot</H3>
+          {CHATBOT_VS.map((v,i) => (
+            <div key={i} style={{display:"flex",gap:10,alignItems:"flex-start",padding:"8px 0",borderBottom:i<CHATBOT_VS.length-1?`1px solid ${C.border}`:"none"}}>
+              <span style={{fontFamily:font.mono,fontSize:11,color:C.red,flexShrink:0,marginTop:1}}>✗</span>
+              <div>
+                <div style={{fontFamily:font.mono,fontSize:10,color:C.muted,textTransform:"uppercase",letterSpacing:1,marginBottom:2}}>{v.dim}</div>
+                <P style={{fontSize:12}}>{v.chatbot}</P>
+              </div>
+            </div>
+          ))}
+        </Card>
+        <Card accent={C.green}>
+          <div style={{paddingTop:8}}>
+          <H3 color={C.green}>Agent</H3>
+          {CHATBOT_VS.map((v,i) => (
+            <div key={i} style={{display:"flex",gap:10,alignItems:"flex-start",padding:"8px 0",borderBottom:i<CHATBOT_VS.length-1?`1px solid ${C.border}`:"none"}}>
+              <span style={{fontFamily:font.mono,fontSize:11,color:C.green,flexShrink:0,marginTop:1}}>✓</span>
+              <div>
+                <div style={{fontFamily:font.mono,fontSize:10,color:C.muted,textTransform:"uppercase",letterSpacing:1,marginBottom:2}}>{v.dim}</div>
+                <P style={{fontSize:12}}>{v.agent}</P>
+              </div>
+            </div>
+          ))}
+          </div>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
+function SectionExamples() {
+  const [active, setActive] = useState(0);
+  const ex = EXAMPLES[active];
+  return (
+    <div style={{display:"flex",flexDirection:"column",gap:16}}>
+      <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+        {EXAMPLES.map((e,i) => (
+          <button key={i} onClick={() => setActive(i)} style={{
+            fontFamily:font.heading,fontSize:12,fontWeight:active===i?700:500,
+            color:active===i?e.color:C.sub,background:active===i?`${e.color}08`:"transparent",
+            border:`1px solid ${active===i?`${e.color}30`:"transparent"}`,
+            borderRadius:4,padding:"8px 14px",cursor:"pointer",transition:"all 0.2s"}}>{e.title}</button>
+        ))}
+      </div>
+      <Card accent={ex.color} style={{border:`2px solid ${ex.color}30`}}>
+        <div style={{paddingTop:8}}>
+          <Tag color={ex.color}>WALKTHROUGH</Tag>
+          <H3 style={{marginTop:10}} color={ex.color}>{ex.title}</H3>
+          {ex.steps.map((s,i) => (
+            <div key={i} style={{display:"flex",gap:12,alignItems:"flex-start",padding:"10px 0",borderBottom:i<ex.steps.length-1?`1px solid ${C.border}`:"none"}}>
+              <div style={{width:22,height:22,borderRadius:4,background:`${ex.color}15`,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:font.mono,fontSize:11,color:ex.color,fontWeight:600,flexShrink:0}}>{i+1}</div>
+              <P style={{fontSize:13}}>{s}</P>
+            </div>
+          ))}
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginTop:16}}>
+            <div style={{padding:12,background:`${ex.color}05`,border:`1px solid ${ex.color}15`,borderRadius:4}}>
+              <div style={{fontFamily:font.mono,fontSize:10,color:ex.color,textTransform:"uppercase",letterSpacing:1,marginBottom:4}}>Agent time</div>
+              <P style={{fontSize:13,fontWeight:600,color:ex.color}}>{ex.time}</P>
+            </div>
+            <div style={{padding:12,background:`${C.green}05`,border:`1px solid ${C.green}15`,borderRadius:4}}>
+              <div style={{fontFamily:font.mono,fontSize:10,color:C.green,textTransform:"uppercase",letterSpacing:1,marginBottom:4}}>Manual equivalent</div>
+              <P style={{fontSize:13,fontWeight:600,color:C.green}}>{ex.saving}</P>
+            </div>
+          </div>
+        </div>
+      </Card>
+    </div>
+  );
+}
+
+export default function AgentsExplainer() {
+  const [tab, setTab] = useState(0);
+  const TABS = ["The Concept","Agent Loop","Tool Types","vs Chatbot","Real Examples"];
+  const sections = [<SectionConcept/>,<SectionLoop/>,<SectionTools/>,<SectionVsChatbot/>,<SectionExamples/>];
+  return (
+    <div style={{background:C.bg,minHeight:"100vh",fontFamily:font.body,color:C.text}}>
+      <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+      <div style={{padding:"32px 24px 0",maxWidth:800,margin:"0 auto"}}>
+        <span style={{fontFamily:font.mono,fontSize:11,color:C.accent,background:`${C.accent}10`,padding:"2px 10px",borderRadius:3,letterSpacing:2,textTransform:"uppercase"}}>Visual Explainer</span>
+        <h1 style={{fontFamily:font.heading,fontSize:30,fontWeight:700,color:C.text,margin:"8px 0 4px",lineHeight:1.2,letterSpacing:-0.5}}>What are AI Agents?</h1>
+        <P>AI that doesn't just answer — it acts. The loop, the tools, and why agents are a fundamentally different kind of system.</P>
+      </div>
+      <div style={{maxWidth:800,margin:"20px auto 0",padding:"0 24px",display:"flex",gap:4,flexWrap:"wrap"}}>
+        {TABS.map((t,i) => (
+          <button key={i} onClick={() => setTab(i)} style={{fontFamily:font.heading,fontSize:12,fontWeight:tab===i?700:500,color:tab===i?C.accent:C.sub,background:tab===i?`${C.accent}08`:"transparent",border:`1px solid ${tab===i?`${C.accent}30`:"transparent"}`,borderRadius:4,padding:"8px 14px",cursor:"pointer",transition:"all 0.2s"}}>{t}</button>
+        ))}
+      </div>
+      <div style={{maxWidth:800,margin:"16px auto 40px",padding:"0 24px"}}>{sections[tab]}</div>
+      <div style={{maxWidth:800,margin:"0 auto",padding:"16px 24px 32px",borderTop:`1px solid ${C.border}`}}>
+        <P style={{fontSize:11,color:C.muted,textAlign:"center"}}>
+          <a href="claude.html" style={{color:C.accent,textDecoration:"none"}}>← Claude</a> · <a href="index.html" style={{color:C.accent,textDecoration:"none"}}>AI Concepts Series</a> · <a href="claude-cowork.html" style={{color:C.accent,textDecoration:"none"}}>Claude Cowork →</a>
+        </P>
+      </div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<AgentsExplainer/>);
+</script></body></html>

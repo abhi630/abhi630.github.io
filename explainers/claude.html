@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>What is Claude? — Visual Explainer</title>
+<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>*{box-sizing:border-box;margin:0;padding:0}body{background:#f8f8f6}</style>
+</head><body><div id="root"></div>
+<script type="text/babel">
+const { useState } = React;
+
+const C = {
+  bg:"#f8f8f6", card:"#fff", border:"#e5e5e0",
+  text:"#222", sub:"#666", muted:"#999",
+  accent:"#ea580c", blue:"#0891b2", purple:"#7c3aed",
+  green:"#16a34a", amber:"#ca8a04", red:"#dc2626",
+};
+const font = {
+  heading:"'Space Grotesk', sans-serif",
+  body:"'IBM Plex Sans', sans-serif",
+  mono:"'JetBrains Mono', monospace",
+};
+
+const Card = ({ children, style, accent, onClick }) => (
+  <div onClick={onClick} style={{
+    background:C.card, border:`1px solid ${C.border}`, borderRadius:4,
+    padding:20, position:"relative", overflow:"hidden",
+    boxShadow:"0 1px 3px rgba(0,0,0,0.04)",
+    cursor:onClick?"pointer":"default", ...style
+  }}>
+    {accent && <div style={{position:"absolute",top:0,left:0,right:0,height:3,background:accent}}/>}
+    {children}
+  </div>
+);
+const Tag = ({ color, children }) => (
+  <span style={{fontFamily:font.mono,fontSize:11,color,background:`${color}12`,
+    border:`1px solid ${color}30`,padding:"2px 10px",borderRadius:3,
+    letterSpacing:0.5,display:"inline-block"}}>{children}</span>
+);
+const H2 = ({ children }) => (
+  <h2 style={{fontFamily:font.heading,fontSize:22,fontWeight:700,color:C.text,margin:"0 0 6px"}}>{children}</h2>
+);
+const H3 = ({ children, color }) => (
+  <h3 style={{fontFamily:font.heading,fontSize:16,fontWeight:700,color:color||C.text,margin:"0 0 8px"}}>{children}</h3>
+);
+const P = ({ children, style }) => (
+  <p style={{fontFamily:font.body,fontSize:13.5,color:C.sub,lineHeight:1.65,margin:0,...style}}>{children}</p>
+);
+
+// ── DATA ──────────────────────────────────────────────────────────────────────
+
+const CAPABILITIES = [
+  { id:"write", label:"Writing & Editing", color:C.blue,
+    short:"Drafts, edits, rephrases, summarises — in any style or tone.",
+    detail:"From emails to essays to legal briefs. Claude adapts voice, length, and formality to your audience.",
+    examples:["Write a job posting", "Fix the tone of this email", "Summarise this 20-page doc in 3 bullets"] },
+  { id:"code", label:"Coding", color:C.purple,
+    short:"Writes, reviews, debugs and explains code across all major languages.",
+    detail:"Claude understands context across files, explains what code does in plain language, and catches subtle bugs.",
+    examples:["Build a React component", "Why is this Python throwing a TypeError?", "Convert this SQL to Python pandas"] },
+  { id:"reason", label:"Analysis & Reasoning", color:C.amber,
+    short:"Breaks down complex problems, compares options, identifies trade-offs.",
+    detail:"Give Claude a messy problem and it maps out the variables, weighs options, and explains the reasoning step by step.",
+    examples:["Pros and cons of these two strategies", "What are the risks in this contract?", "Help me think through this decision"] },
+  { id:"research", label:"Research", color:C.green,
+    short:"Synthesises knowledge, explains concepts, answers with nuance.",
+    detail:"Claude draws on broad training to explain ideas clearly — science, history, business, law — and flags where it's uncertain.",
+    examples:["Explain transformer architecture simply", "What happened in the 2008 financial crisis?", "How does this medication work?"] },
+  { id:"chat", label:"Conversation", color:C.accent,
+    short:"Thinks out loud with you — brainstorming, coaching, sounding board.",
+    detail:"Sometimes you don't need an answer, you need to think. Claude is a thinking partner that asks good questions.",
+    examples:["Help me structure my thoughts", "Play devil's advocate on this idea", "What am I missing in this plan?"] },
+];
+
+const VS_ITEMS = [
+  { label:"Memory", claude:"Holds your full conversation in context", other:"Often resets between messages" },
+  { label:"Safety", claude:"Trained to be honest and decline harmful requests", other:"Varies widely" },
+  { label:"Nuance", claude:"Understands tone, subtext, and ambiguity", other:"Often literal and rigid" },
+  { label:"Honesty", claude:"Says 'I don't know' rather than hallucinating", other:"May confidently make things up" },
+  { label:"Length", claude:"Can handle very long documents and threads", other:"Often has short context windows" },
+];
+
+const HOW_STEPS = [
+  { n:1, title:"You write a message", detail:"Anything — a question, a task, a half-formed idea. Claude reads the entire conversation, not just your last line.", color:C.blue },
+  { n:2, title:"Claude reads context", detail:"The model processes your words, the conversation history, and any files you've shared — all at once.", color:C.purple },
+  { n:3, title:"Patterns activate", detail:"Billions of learned associations from training fire together to build an understanding of what you need.", color:C.amber },
+  { n:4, title:"Response is generated", detail:"Claude predicts the most helpful, honest, and harmless continuation — word by word, shaped by its values.", color:C.green },
+  { n:5, title:"You reply & refine", detail:"The conversation continues. Claude remembers everything said, so you can build on prior context naturally.", color:C.accent },
+];
+
+// ── SECTIONS ──────────────────────────────────────────────────────────────────
+
+function SectionWhatItIs() {
+  return (
+    <div style={{display:"flex",flexDirection:"column",gap:16}}>
+      <Card accent={C.accent}>
+        <div style={{paddingTop:8}}>
+          <Tag color={C.accent}>DEFINITION</Tag>
+          <P style={{marginTop:12,fontSize:15,color:C.text,fontFamily:font.body,fontWeight:500,lineHeight:1.7}}>
+            Claude is an AI assistant made by Anthropic — a company whose mission is building AI that is safe and beneficial.
+            You have a conversation with Claude in plain language, and it responds like a thoughtful, knowledgeable collaborator.
+          </P>
+        </div>
+      </Card>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16}}>
+        <Card>
+          <H3 color={C.blue}>The Analogy</H3>
+          <P>Think of a very well-read colleague who is always available, never gets tired, and can switch from debugging your code to drafting a board memo in the same conversation.</P>
+        </Card>
+        <Card>
+          <H3 color={C.purple}>Not a Search Engine</H3>
+          <P>Claude doesn't retrieve web pages. It reasons, synthesises, and generates — producing answers tailored to exactly what you asked, not a list of links.</P>
+        </Card>
+      </div>
+      <Card style={{background:`${C.purple}06`,border:`1px solid ${C.purple}20`}}>
+        <Tag color={C.purple}>KEY INSIGHT</Tag>
+        <P style={{marginTop:8}}>The defining property of Claude isn't what it knows — it's how it understands. It grasps intent, detects ambiguity, and adjusts its output to fit your actual situation.</P>
+      </Card>
+    </div>
+  );
+}
+
+function SectionHowItThinks() {
+  const [active, setActive] = useState(null);
+  return (
+    <div style={{display:"flex",flexDirection:"column",gap:12}}>
+      <P style={{marginBottom:4}}>Click any step to see what's happening inside.</P>
+      {HOW_STEPS.map((s,i) => (
+        <Card key={i} onClick={() => setActive(active===i?null:i)}
+          accent={active===i?s.color:undefined}
+          style={{border:active===i?`2px solid ${s.color}`:`1px solid ${C.border}`,
+            padding:active===i?"16px 19px":20,transition:"all 0.2s"}}>
+          <div style={{display:"flex",gap:14,alignItems:"center"}}>
+            <div style={{width:32,height:32,borderRadius:4,background:s.color,
+              display:"flex",alignItems:"center",justifyContent:"center",
+              fontFamily:font.mono,fontSize:14,fontWeight:600,color:"#fff",flexShrink:0}}>{s.n}</div>
+            <div style={{flex:1}}>
+              <H3 color={active===i?s.color:C.text}>{s.title}</H3>
+              <P style={{fontSize:12.5}}>{s.detail}</P>
+            </div>
+            <span style={{fontFamily:font.mono,fontSize:11,color:C.muted}}>{active===i?"▲":"▼"}</span>
+          </div>
+          {active===i && (
+            <div style={{marginTop:12,padding:12,background:`${s.color}05`,
+              border:`1px solid ${s.color}15`,borderRadius:4}}>
+              <P style={{fontSize:12.5,color:s.color,fontWeight:500}}>
+                {s.n===1 && "Even a vague message like 'help me with this thing' gives Claude signal about tone, formality, and what kind of response you need."}
+                {s.n===2 && "This is why Claude feels coherent across a long conversation — it never 'forgets' what was said earlier in the thread."}
+                {s.n===3 && "Training on diverse human text means Claude has internalized patterns of reasoning, style, and domain knowledge — not just facts."}
+                {s.n===4 && "Values like honesty, helpfulness, and harm avoidance are embedded in the training process, not bolted on as filters afterward."}
+                {s.n===5 && "Unlike a single-shot query, conversations let you iterate, push back, ask for alternatives, and refine toward exactly what you need."}
+              </P>
+            </div>
+          )}
+        </Card>
+      ))}
+    </div>
+  );
+}
+
+function SectionCapabilities() {
+  const [active, setActive] = useState(0);
+  const item = CAPABILITIES[active];
+  return (
+    <div style={{display:"flex",flexDirection:"column",gap:16}}>
+      <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+        {CAPABILITIES.map((c,i) => (
+          <button key={i} onClick={() => setActive(i)} style={{
+            fontFamily:font.heading,fontSize:12,fontWeight:active===i?700:500,
+            color:active===i?c.color:C.sub,
+            background:active===i?`${c.color}08`:"transparent",
+            border:`1px solid ${active===i?`${c.color}30`:"transparent"}`,
+            borderRadius:4,padding:"8px 14px",cursor:"pointer",transition:"all 0.2s"
+          }}>{c.label}</button>
+        ))}
+      </div>
+      <Card accent={item.color} style={{border:`2px solid ${item.color}30`}}>
+        <div style={{paddingTop:8}}>
+          <Tag color={item.color}>{item.label.toUpperCase()}</Tag>
+          <H3 style={{marginTop:10}} color={item.color}>{item.short}</H3>
+          <P>{item.detail}</P>
+          <div style={{marginTop:16}}>
+            <div style={{fontFamily:font.mono,fontSize:10,color:C.muted,
+              textTransform:"uppercase",letterSpacing:1,marginBottom:10}}>EXAMPLE PROMPTS</div>
+            {item.examples.map((ex,i) => (
+              <div key={i} style={{display:"flex",gap:10,alignItems:"flex-start",
+                padding:"8px 0",borderBottom:i<item.examples.length-1?`1px solid ${C.border}`:"none"}}>
+                <span style={{fontFamily:font.mono,fontSize:11,color:item.color,flexShrink:0}}>→</span>
+                <P style={{fontSize:12.5,color:C.text}}>"{ex}"</P>
+              </div>
+            ))}
+          </div>
+        </div>
+      </Card>
+    </div>
+  );
+}
+
+function SectionVsOtherAI() {
+  return (
+    <div style={{display:"flex",flexDirection:"column",gap:16}}>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16}}>
+        <Card>
+          <H3 color={C.red}>Generic AI assistants</H3>
+          {VS_ITEMS.map((v,i) => (
+            <div key={i} style={{display:"flex",gap:10,alignItems:"flex-start",
+              padding:"8px 0",borderBottom:i<VS_ITEMS.length-1?`1px solid ${C.border}`:"none"}}>
+              <span style={{fontFamily:font.mono,fontSize:11,color:C.red,flexShrink:0,marginTop:1}}>✗</span>
+              <div>
+                <div style={{fontFamily:font.mono,fontSize:10,color:C.muted,
+                  textTransform:"uppercase",letterSpacing:1,marginBottom:2}}>{v.label}</div>
+                <P style={{fontSize:12}}>{v.other}</P>
+              </div>
+            </div>
+          ))}
+        </Card>
+        <Card accent={C.green}>
+          <div style={{paddingTop:8}}>
+          <H3 color={C.green}>Claude</H3>
+          {VS_ITEMS.map((v,i) => (
+            <div key={i} style={{display:"flex",gap:10,alignItems:"flex-start",
+              padding:"8px 0",borderBottom:i<VS_ITEMS.length-1?`1px solid ${C.border}`:"none"}}>
+              <span style={{fontFamily:font.mono,fontSize:11,color:C.green,flexShrink:0,marginTop:1}}>✓</span>
+              <div>
+                <div style={{fontFamily:font.mono,fontSize:10,color:C.muted,
+                  textTransform:"uppercase",letterSpacing:1,marginBottom:2}}>{v.label}</div>
+                <P style={{fontSize:12}}>{v.claude}</P>
+              </div>
+            </div>
+          ))}
+          </div>
+        </Card>
+      </div>
+      <Card style={{background:`${C.purple}06`,border:`1px solid ${C.purple}20`}}>
+        <Tag color={C.purple}>KEY INSIGHT</Tag>
+        <P style={{marginTop:8}}>The difference isn't benchmark scores — it's character. Claude is designed to be genuinely helpful, calibrated about uncertainty, and honest even when a different answer would be easier.</P>
+      </Card>
+    </div>
+  );
+}
+
+function SectionGetStarted() {
+  const tips = [
+    { title:"Be specific about context", detail:"Tell Claude who you are and what you're trying to accomplish. 'I'm a product manager writing a spec for engineers' gives it much more to work with.", color:C.blue },
+    { title:"Iterate, don't restart", detail:"If Claude's first answer isn't right, tell it what's off. 'Make it shorter', 'More formal', 'That's not the constraint I meant'. Don't re-prompt from scratch.", color:C.purple },
+    { title:"Ask it to explain", detail:"Claude is often more useful when asked to show its reasoning: 'Walk me through how you got to that recommendation'.", color:C.amber },
+    { title:"Give it documents to work with", detail:"Paste in the raw material — the email, the code, the report — and ask Claude to act on it. It reads long inputs well.", color:C.green },
+    { title:"Push back when wrong", detail:"Claude is fallible. If something seems off, say so. It will reconsider, and it won't get defensive.", color:C.accent },
+  ];
+  const [open, setOpen] = useState(null);
+  return (
+    <div style={{display:"flex",flexDirection:"column",gap:12}}>
+      <P style={{marginBottom:4}}>Five practices that immediately improve your results with Claude.</P>
+      {tips.map((t,i) => (
+        <Card key={i} onClick={() => setOpen(open===i?null:i)}
+          style={{cursor:"pointer",transition:"all 0.2s",
+            border:open===i?`2px solid ${t.color}`:`1px solid ${C.border}`,
+            padding:open===i?"16px 19px":20}}>
+          <div style={{display:"flex",alignItems:"center",gap:12}}>
+            <div style={{width:24,height:24,borderRadius:4,background:`${t.color}15`,
+              display:"flex",alignItems:"center",justifyContent:"center",
+              fontFamily:font.mono,fontSize:11,color:t.color,fontWeight:600,flexShrink:0}}>{i+1}</div>
+            <H3 color={open===i?t.color:C.text}>{t.title}</H3>
+            <span style={{fontFamily:font.mono,fontSize:11,color:C.muted,marginLeft:"auto"}}>{open===i?"▲":"▼"}</span>
+          </div>
+          {open===i && (
+            <div style={{marginTop:10,paddingLeft:36}}>
+              <P>{t.detail}</P>
+            </div>
+          )}
+        </Card>
+      ))}
+    </div>
+  );
+}
+
+// ── MAIN ──────────────────────────────────────────────────────────────────────
+
+export default function ClaudeExplainer() {
+  const [tab, setTab] = useState(0);
+  const TABS = ["What It Is","How It Thinks","Capabilities","vs Other AI","Get Started"];
+  const sections = [<SectionWhatItIs/>,<SectionHowItThinks/>,<SectionCapabilities/>,<SectionVsOtherAI/>,<SectionGetStarted/>];
+  return (
+    <div style={{background:C.bg,minHeight:"100vh",fontFamily:font.body,color:C.text}}>
+      <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+      <div style={{padding:"32px 24px 0",maxWidth:800,margin:"0 auto"}}>
+        <div style={{marginBottom:4}}>
+          <span style={{fontFamily:font.mono,fontSize:11,color:C.accent,background:`${C.accent}10`,
+            padding:"2px 10px",borderRadius:3,letterSpacing:2,textTransform:"uppercase"}}>Visual Explainer</span>
+        </div>
+        <h1 style={{fontFamily:font.heading,fontSize:30,fontWeight:700,color:C.text,
+          margin:"8px 0 4px",lineHeight:1.2,letterSpacing:-0.5}}>What is Claude?</h1>
+        <P>Anthropic's AI assistant — what it is, how it thinks, and why it behaves differently from other AI.</P>
+      </div>
+      <div style={{maxWidth:800,margin:"20px auto 0",padding:"0 24px",display:"flex",gap:4,flexWrap:"wrap"}}>
+        {TABS.map((t,i) => (
+          <button key={i} onClick={() => setTab(i)} style={{
+            fontFamily:font.heading,fontSize:12,fontWeight:tab===i?700:500,
+            color:tab===i?C.accent:C.sub,background:tab===i?`${C.accent}08`:"transparent",
+            border:`1px solid ${tab===i?`${C.accent}30`:"transparent"}`,
+            borderRadius:4,padding:"8px 14px",cursor:"pointer",transition:"all 0.2s"}}>{t}</button>
+        ))}
+      </div>
+      <div style={{maxWidth:800,margin:"16px auto 40px",padding:"0 24px"}}>
+        {sections[tab]}
+      </div>
+      <div style={{maxWidth:800,margin:"0 auto",padding:"16px 24px 32px",borderTop:`1px solid ${C.border}`}}>
+        <P style={{fontSize:11,color:C.muted,textAlign:"center"}}>
+          Claude is built by Anthropic · Part of the <a href="index.html" style={{color:C.accent,textDecoration:"none"}}>AI Concepts Explainer Series</a> · <a href="agents.html" style={{color:C.accent,textDecoration:"none"}}>Next: AI Agents →</a>
+        </P>
+      </div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<ClaudeExplainer/>);
+</script></body></html>

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>What is Claude Cowork? — Visual Explainer</title>
+<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>*{box-sizing:border-box;margin:0;padding:0}body{background:#f8f8f6}</style>
+</head><body><div id="root"></div>
+<script type="text/babel">
+const { useState } = React;
+const C = { bg:"#f8f8f6",card:"#fff",border:"#e5e5e0",text:"#222",sub:"#666",muted:"#999",accent:"#ea580c",blue:"#0891b2",purple:"#7c3aed",green:"#16a34a",amber:"#ca8a04",red:"#dc2626" };
+const font = { heading:"'Space Grotesk', sans-serif", body:"'IBM Plex Sans', sans-serif", mono:"'JetBrains Mono', monospace" };
+const Card = ({ children, style, accent, onClick }) => (
+  <div onClick={onClick} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:4,padding:20,position:"relative",overflow:"hidden",boxShadow:"0 1px 3px rgba(0,0,0,0.04)",cursor:onClick?"pointer":"default",...style}}>
+    {accent && <div style={{position:"absolute",top:0,left:0,right:0,height:3,background:accent}}/>}
+    {children}
+  </div>
+);
+const Tag = ({ color, children }) => (
+  <span style={{fontFamily:font.mono,fontSize:11,color,background:`${color}12`,border:`1px solid ${color}30`,padding:"2px 10px",borderRadius:3,letterSpacing:0.5,display:"inline-block"}}>{children}</span>
+);
+const H3 = ({ children, color }) => <h3 style={{fontFamily:font.heading,fontSize:16,fontWeight:700,color:color||C.text,margin:"0 0 8px"}}>{children}</h3>;
+const P = ({ children, style }) => <p style={{fontFamily:font.body,fontSize:13.5,color:C.sub,lineHeight:1.65,margin:0,...style}}>{children}</p>;
+
+const FEATURES = [
+  { id:"files", label:"File Access", color:C.blue, desc:"Claude reads and writes real files on your computer — Word docs, spreadsheets, PDFs, code files — not just copy-pasted text.", why:"Stop copy-pasting content into a chat box. Grant Cowork access to a folder and Claude works directly with your files.", example:"'Summarise all PDFs in this folder and write a report'" },
+  { id:"skills", label:"Skills & Plugins", color:C.purple, desc:"Skills are pre-built instruction sets that prime Claude for specific workflows — presentations, spreadsheets, marketing content, legal review.", why:"Instead of writing complex prompts every time, you invoke a skill and Claude immediately knows the format, style, and standards.", example:"'/pptx Create a 10-slide pitch deck from this brief'" },
+  { id:"schedule", label:"Scheduled Tasks", color:C.amber, desc:"Cowork tasks can run on a cron schedule — daily, weekly, at a specific time — without you being present.", why:"Automate repetitive knowledge work: daily briefings, weekly reports, regular content generation.", example:"'Every Monday 9am: pull last week's metrics and draft summary'" },
+  { id:"desktop", label:"Desktop App", color:C.green, desc:"Cowork runs as a native desktop application alongside your other tools — not a browser tab you lose track of.", why:"Persistent access to your files, no browser permission friction, feels like part of your OS.", example:"Sits in your dock. Open, give a task, close. Work happens." },
+  { id:"todo", label:"Task Tracking", color:C.accent, desc:"Cowork shows a live todo list as Claude works through multi-step tasks — so you always know what it's doing.", why:"Long tasks become transparent. You can see 'Step 3 of 7' rather than wondering if Claude is still thinking.", example:"Progress bar with labelled steps updates in real time" },
+];
+
+const USE_CASES = [
+  { title:"Document Processing", color:C.blue, tasks:["Extract tables from 20 PDFs into one spreadsheet","Reformat a report to match a corporate template","Find all action items across a folder of meeting notes"] },
+  { title:"Content Creation", color:C.purple, tasks:["Generate a week of social posts from a single brief","Turn a blog post into a LinkedIn carousel and email","Create an SEO article following brand guidelines"] },
+  { title:"Research & Briefings", color:C.amber, tasks:["Compile a competitive landscape from multiple sources","Daily news briefing filtered to topics you care about","Summarise a stack of papers into a two-page overview"] },
+  { title:"Data & Reporting", color:C.green, tasks:["Build a weekly KPI spreadsheet from raw exports","Write the narrative around a chart from data","Flag anomalies in a dataset and explain them"] },
+];
+
+const HOW_STEPS = [
+  { n:1, title:"Grant folder access", detail:"You choose which folder on your computer Cowork can read and write. Everything inside that folder is accessible to Claude.", color:C.blue },
+  { n:2, title:"Type a task", detail:"In plain language: 'Read all the PDFs here and write a 1-page summary', or invoke a skill with a slash command like /docx.", color:C.purple },
+  { n:3, title:"Watch the todo list", detail:"Cowork shows each step it's taking — reading File A, processing File B, writing output. You see exactly what's happening.", color:C.amber },
+  { n:4, title:"Find your output", detail:"The finished file appears in your outputs folder, ready to open. Cowork links to it directly in the chat.", color:C.green },
+];
+
+function SectionWhatItIs() {
+  return (
+    <div style={{display:"flex",flexDirection:"column",gap:16}}>
+      <Card accent={C.accent}>
+        <div style={{paddingTop:8}}>
+          <Tag color={C.accent}>DEFINITION</Tag>
+          <P style={{marginTop:12,fontSize:15,color:C.text,fontWeight:500,lineHeight:1.7}}>
+            Claude Cowork is a desktop app that brings Claude into your actual workflow — with access to your files, the ability to run scheduled tasks, and skills pre-built for specific knowledge work.
+          </P>
+        </div>
+      </Card>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16}}>
+        <Card>
+          <H3 color={C.blue}>vs Claude.ai</H3>
+          <P>Claude.ai is a conversation. Cowork is a co-worker. It can open your files, run on a schedule, use specialist skills, and produce real deliverables — not just chat responses.</P>
+        </Card>
+        <Card>
+          <H3 color={C.purple}>The Core Idea</H3>
+          <P>Instead of constantly copying content into a chat box, you give Claude access to your folder, describe the task, and it handles the rest — reading, processing, writing, and saving.</P>
+        </Card>
+      </div>
+      <Card style={{background:`${C.purple}06`,border:`1px solid ${C.purple}20`}}>
+        <Tag color={C.purple}>KEY INSIGHT</Tag>
+        <P style={{marginTop:8}}>The most powerful thing about Cowork isn't a single feature — it's the combination: file access + skills + scheduling means Claude can handle entire recurring workflows, not just one-off tasks.</P>
+      </Card>
+    </div>
+  );
+}
+
+function SectionFeatures() {
+  const [active, setActive] = useState(0);
+  const f = FEATURES[active];
+  return (
+    <div style={{display:"flex",flexDirection:"column",gap:16}}>
+      <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+        {FEATURES.map((ft,i) => (
+          <button key={i} onClick={() => setActive(i)} style={{fontFamily:font.heading,fontSize:12,fontWeight:active===i?700:500,color:active===i?ft.color:C.sub,background:active===i?`${ft.color}08`:"transparent",border:`1px solid ${active===i?`${ft.color}30`:"transparent"}`,borderRadius:4,padding:"8px 14px",cursor:"pointer",transition:"all 0.2s"}}>{ft.label}</button>
+        ))}
+      </div>
+      <Card accent={f.color} style={{border:`2px solid ${f.color}30`}}>
+        <div style={{paddingTop:8}}>
+          <Tag color={f.color}>{f.label.toUpperCase()}</Tag>
+          <P style={{marginTop:10,marginBottom:12}}>{f.desc}</P>
+          <div style={{padding:12,background:`${f.color}05`,border:`1px solid ${f.color}15`,borderRadius:4,marginBottom:12}}>
+            <div style={{fontFamily:font.mono,fontSize:10,color:f.color,textTransform:"uppercase",letterSpacing:1,marginBottom:6}}>WHY IT MATTERS</div>
+            <P style={{fontSize:12.5}}>{f.why}</P>
+          </div>
+          <div style={{padding:12,background:`${C.text}04`,border:`1px solid ${C.border}`,borderRadius:4}}>
+            <div style={{fontFamily:font.mono,fontSize:10,color:C.muted,textTransform:"uppercase",letterSpacing:1,marginBottom:6}}>EXAMPLE</div>
+            <P style={{fontSize:12.5,color:C.text,fontStyle:"italic"}}>"{f.example}"</P>
+          </div>
+        </div>
+      </Card>
+    </div>
+  );
+}
+
+function SectionHowItWorks() {
+  const [active, setActive] = useState(null);
+  return (
+    <div style={{display:"flex",flexDirection:"column",gap:12}}>
+      <P style={{marginBottom:4}}>A typical Cowork session from first click to finished output.</P>
+      {HOW_STEPS.map((s,i) => (
+        <div key={i}>
+          <Card onClick={() => setActive(active===i?null:i)} accent={active===i?s.color:undefined}
+            style={{border:active===i?`2px solid ${s.color}`:`1px solid ${C.border}`,padding:active===i?"16px 19px":20,transition:"all 0.2s"}}>
+            <div style={{display:"flex",gap:14,alignItems:"center"}}>
+              <div style={{width:32,height:32,borderRadius:4,background:s.color,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:font.mono,fontSize:14,fontWeight:600,color:"#fff",flexShrink:0}}>{s.n}</div>
+              <div style={{flex:1}}>
+                <H3 color={active===i?s.color:C.text}>{s.title}</H3>
+                <P style={{fontSize:12.5}}>{s.detail}</P>
+              </div>
+              <span style={{fontFamily:font.mono,fontSize:11,color:C.muted}}>{active===i?"▲":"▼"}</span>
+            </div>
+            {active===i && (
+              <div style={{marginTop:12,padding:12,background:`${s.color}05`,border:`1px solid ${s.color}15`,borderRadius:4}}>
+                <P style={{fontSize:12.5,color:s.color,fontWeight:500}}>
+                  {i===0 && "You control exactly what Claude can see. One project folder, a downloads folder, a specific workspace — your choice. Nothing outside that folder is accessible."}
+                  {i===1 && "Skills like /pptx, /docx, /pdf load expert-level instructions so Claude knows exactly how to format and structure the output without you specifying every detail."}
+                  {i===2 && "The todo list updates in real time. For a 10-file processing task, you'll see each file tick off as Claude completes it. You can read the chat, ask questions, or step away."}
+                  {i===3 && "Cowork outputs land in a dedicated outputs folder with a clickable link in the chat. For supported formats (.docx, .pptx, .pdf) you can open them directly."}
+                </P>
+              </div>
+            )}
+          </Card>
+          {i < HOW_STEPS.length-1 && <div style={{textAlign:"center",padding:"4px 0",color:C.muted,fontSize:16}}>↓</div>}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function SectionUseCases() {
+  const [active, setActive] = useState(0);
+  const uc = USE_CASES[active];
+  return (
+    <div style={{display:"flex",flexDirection:"column",gap:16}}>
+      <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+        {USE_CASES.map((u,i) => (
+          <button key={i} onClick={() => setActive(i)} style={{fontFamily:font.heading,fontSize:12,fontWeight:active===i?700:500,color:active===i?u.color:C.sub,background:active===i?`${u.color}08`:"transparent",border:`1px solid ${active===i?`${u.color}30`:"transparent"}`,borderRadius:4,padding:"8px 14px",cursor:"pointer",transition:"all 0.2s"}}>{u.title}</button>
+        ))}
+      </div>
+      <Card accent={uc.color} style={{border:`2px solid ${uc.color}30`}}>
+        <div style={{paddingTop:8}}>
+          <Tag color={uc.color}>{uc.title.toUpperCase()}</Tag>
+          <div style={{marginTop:12}}>
+            {uc.tasks.map((t,i) => (
+              <div key={i} style={{display:"flex",gap:12,alignItems:"flex-start",padding:"10px 0",borderBottom:i<uc.tasks.length-1?`1px solid ${C.border}`:"none"}}>
+                <span style={{fontFamily:font.mono,fontSize:11,color:uc.color,flexShrink:0,marginTop:2}}>→</span>
+                <P style={{fontSize:13,color:C.text}}>"{t}"</P>
+              </div>
+            ))}
+          </div>
+        </div>
+      </Card>
+    </div>
+  );
+}
+
+export default function CoworkExplainer() {
+  const [tab, setTab] = useState(0);
+  const TABS = ["What It Is","Key Features","How It Works","Use Cases"];
+  const sections = [<SectionWhatItIs/>,<SectionFeatures/>,<SectionHowItWorks/>,<SectionUseCases/>];
+  return (
+    <div style={{background:C.bg,minHeight:"100vh",fontFamily:font.body,color:C.text}}>
+      <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+      <div style={{padding:"32px 24px 0",maxWidth:800,margin:"0 auto"}}>
+        <span style={{fontFamily:font.mono,fontSize:11,color:C.accent,background:`${C.accent}10`,padding:"2px 10px",borderRadius:3,letterSpacing:2,textTransform:"uppercase"}}>Visual Explainer</span>
+        <h1 style={{fontFamily:font.heading,fontSize:30,fontWeight:700,color:C.text,margin:"8px 0 4px",lineHeight:1.2,letterSpacing:-0.5}}>What is Claude Cowork?</h1>
+        <P>The desktop app that brings Claude into your actual file system — with skills, scheduling, and real deliverables.</P>
+      </div>
+      <div style={{maxWidth:800,margin:"20px auto 0",padding:"0 24px",display:"flex",gap:4,flexWrap:"wrap"}}>
+        {TABS.map((t,i) => (<button key={i} onClick={() => setTab(i)} style={{fontFamily:font.heading,fontSize:12,fontWeight:tab===i?700:500,color:tab===i?C.accent:C.sub,background:tab===i?`${C.accent}08`:"transparent",border:`1px solid ${tab===i?`${C.accent}30`:"transparent"}`,borderRadius:4,padding:"8px 14px",cursor:"pointer",transition:"all 0.2s"}}>{t}</button>))}
+      </div>
+      <div style={{maxWidth:800,margin:"16px auto 40px",padding:"0 24px"}}>{sections[tab]}</div>
+      <div style={{maxWidth:800,margin:"0 auto",padding:"16px 24px 32px",borderTop:`1px solid ${C.border}`}}>
+        <P style={{fontSize:11,color:C.muted,textAlign:"center"}}><a href="agents.html" style={{color:C.accent,textDecoration:"none"}}>← AI Agents</a> · <a href="index.html" style={{color:C.accent,textDecoration:"none"}}>AI Concepts Series</a> · <a href="ai-memory.html" style={{color:C.accent,textDecoration:"none"}}>AI Memory →</a></P>
+      </div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<CoworkExplainer/>);
+</script></body></html>

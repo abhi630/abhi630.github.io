@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>AI Concepts — Visual Explainer Series</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#f8f8f6;font-family:'IBM Plex Sans',sans-serif;color:#222;min-height:100vh}
+.container{max-width:800px;margin:0 auto;padding:0 24px}
+.header{padding:48px 24px 32px;max-width:800px;margin:0 auto}
+.tag{font-family:'JetBrains Mono',monospace;font-size:11px;color:#ea580c;background:#ea580c10;padding:2px 10px;border-radius:3px;letter-spacing:2px;text-transform:uppercase;display:inline-block;margin-bottom:16px}
+h1{font-family:'Space Grotesk',sans-serif;font-size:30px;font-weight:700;color:#222;margin-bottom:8px;letter-spacing:-0.5px}
+.subtitle{font-size:13.5px;color:#666;line-height:1.65;max-width:560px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;margin:24px 0 48px}
+.card{background:#fff;border:1px solid #e5e5e0;border-radius:4px;padding:20px;text-decoration:none;color:#222;display:block;position:relative;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.04);transition:all 0.2s}
+.card:hover{box-shadow:0 4px 12px rgba(0,0,0,0.08);transform:translateY(-1px)}
+.card-bar{position:absolute;top:0;left:0;right:0;height:3px}
+.card-num{font-family:'JetBrains Mono',monospace;font-size:10px;color:#999;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px}
+.card-title{font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:700;margin-bottom:6px}
+.card-desc{font-size:12.5px;color:#666;line-height:1.55}
+.card-tag{font-family:'JetBrains Mono',monospace;font-size:10px;padding:2px 8px;border-radius:3px;display:inline-block;margin-top:10px;letter-spacing:0.5px}
+footer{border-top:1px solid #e5e5e0;padding:16px 24px 32px;max-width:800px;margin:0 auto;text-align:center;font-size:11px;color:#999;font-family:'IBM Plex Sans',sans-serif}
+footer a{color:#ea580c;text-decoration:none;font-weight:600}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="tag">Visual Explainer Series</div>
+  <h1>AI Concepts, Explained Simply</h1>
+  <p class="subtitle">Seven interactive explainers covering the core ideas behind modern AI — from what Claude is to how agentic systems work. Each explainer is tabbed, clickable, and designed to teach, not impress.</p>
+</div>
+<div class="container">
+  <div class="grid">
+    <a href="claude.html" class="card">
+      <div class="card-bar" style="background:#ea580c"></div>
+      <div class="card-num">01 / 07</div>
+      <div class="card-title" style="color:#ea580c">What is Claude?</div>
+      <div class="card-desc">Anthropic's AI assistant — what it is, how it thinks, and why it behaves differently.</div>
+      <div class="card-tag" style="color:#ea580c;background:#ea580c12;border:1px solid #ea580c30">5 tabs · Interactive</div>
+    </a>
+    <a href="agents.html" class="card">
+      <div class="card-bar" style="background:#16a34a"></div>
+      <div class="card-num">02 / 07</div>
+      <div class="card-title" style="color:#16a34a">What are AI Agents?</div>
+      <div class="card-desc">AI that doesn't just answer — it acts. The loop, tools, and real examples.</div>
+      <div class="card-tag" style="color:#16a34a;background:#16a34a12;border:1px solid #16a34a30">5 tabs · Interactive</div>
+    </a>
+    <a href="claude-cowork.html" class="card">
+      <div class="card-bar" style="background:#0891b2"></div>
+      <div class="card-num">03 / 07</div>
+      <div class="card-title" style="color:#0891b2">Claude Cowork</div>
+      <div class="card-desc">The desktop app that brings Claude into your file system — with skills and scheduling.</div>
+      <div class="card-tag" style="color:#0891b2;background:#0891b212;border:1px solid #0891b230">4 tabs · Interactive</div>
+    </a>
+    <a href="ai-memory.html" class="card">
+      <div class="card-bar" style="background:#7c3aed"></div>
+      <div class="card-num">04 / 07</div>
+      <div class="card-title" style="color:#7c3aed">How AI Memory Works</div>
+      <div class="card-desc">The four memory types, how they're layered, and the trade-offs every system must navigate.</div>
+      <div class="card-tag" style="color:#7c3aed;background:#7c3aed12;border:1px solid #7c3aed30">4 tabs · Interactive</div>
+    </a>
+    <a href="agentic-system.html" class="card">
+      <div class="card-bar" style="background:#dc2626"></div>
+      <div class="card-num">05 / 07</div>
+      <div class="card-title" style="color:#dc2626">Agentic Systems</div>
+      <div class="card-desc">The full autonomy spectrum — from single prompts to self-directing multi-agent networks.</div>
+      <div class="card-tag" style="color:#dc2626;background:#dc262612;border:1px solid #dc262630">4 tabs · Interactive</div>
+    </a>
+    <a href="semantics.html" class="card">
+      <div class="card-bar" style="background:#ca8a04"></div>
+      <div class="card-num">06 / 07</div>
+      <div class="card-title" style="color:#ca8a04">Semantics in AI</div>
+      <div class="card-desc">How AI represents meaning — embeddings, context sensitivity, and why it's the foundation of everything.</div>
+      <div class="card-tag" style="color:#ca8a04;background:#ca8a0412;border:1px solid #ca8a0430">4 tabs · Interactive</div>
+    </a>
+    <a href="automation.html" class="card">
+      <div class="card-bar" style="background:#7c3aed"></div>
+      <div class="card-num">07 / 07</div>
+      <div class="card-title" style="color:#7c3aed">AI Automation</div>
+      <div class="card-desc">Manual to agentic — the full spectrum, before/after comparisons, and principles for doing it right.</div>
+      <div class="card-tag" style="color:#7c3aed;background:#7c3aed12;border:1px solid #7c3aed30">3 tabs · Interactive</div>
+    </a>
+  </div>
+</div>
+<footer>
+  Generated by Claude · <a href="https://claude.ai">claude.ai</a> · Auto-refreshed daily
+</footer>
+</body>
+</html>
