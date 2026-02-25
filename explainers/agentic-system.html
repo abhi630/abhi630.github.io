@@ -1,188 +1,597 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>What is an Agentic System? — Visual Explainer</title>
-<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-<style>*{box-sizing:border-box;margin:0;padding:0}body{background:#f8f8f6}</style>
-</head><body><div id="root"></div>
-<script type="text/babel">
-const { useState } = React;
-const C = { bg:"#f8f8f6",card:"#fff",border:"#e5e5e0",text:"#222",sub:"#666",muted:"#999",accent:"#ea580c",blue:"#0891b2",purple:"#7c3aed",green:"#16a34a",amber:"#ca8a04",red:"#dc2626" };
-const font = { heading:"'Space Grotesk', sans-serif", body:"'IBM Plex Sans', sans-serif", mono:"'JetBrains Mono', monospace" };
-const LEVEL_COLORS = { 0:"#94a3b8", 1:"#0891b2", 2:"#ca8a04", 3:"#ea580c", 4:"#dc2626", 5:"#7c3aed" };
-const Card = ({ children, style, accent, onClick }) => (
-  <div onClick={onClick} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:4,padding:20,position:"relative",overflow:"hidden",boxShadow:"0 1px 3px rgba(0,0,0,0.04)",cursor:onClick?"pointer":"default",...style}}>
-    {accent && <div style={{position:"absolute",top:0,left:0,right:0,height:3,background:accent}}/>}
-    {children}
-  </div>
-);
-const Tag = ({ color, children }) => <span style={{fontFamily:font.mono,fontSize:11,color,background:`${color}12`,border:`1px solid ${color}30`,padding:"2px 10px",borderRadius:3,letterSpacing:0.5,display:"inline-block"}}>{children}</span>;
-const H3 = ({ children, color }) => <h3 style={{fontFamily:font.heading,fontSize:16,fontWeight:700,color:color||C.text,margin:"0 0 8px"}}>{children}</h3>;
-const P = ({ children, style }) => <p style={{fontFamily:font.body,fontSize:13.5,color:C.sub,lineHeight:1.65,margin:0,...style}}>{children}</p>;
-
-const LEVELS = [
-  { level:0, name:"Simple Responder", color:LEVEL_COLORS[0], desc:"A model that responds to a single prompt with no tools, no memory, no follow-up.", example:"'What's the capital of France?' → 'Paris'", autonomy:"None", human:"100% of decisions", risk:"Very Low" },
-  { level:1, name:"Tool-Augmented", color:LEVEL_COLORS[1], desc:"A model that can call a predefined set of tools (search, calculator) within a single response turn.", example:"Weather query → calls weather API → returns current temp", autonomy:"Minimal", human:"All goals set by human", risk:"Low" },
-  { level:2, name:"Workflow Agent", color:LEVEL_COLORS[2], desc:"An agent that executes a multi-step workflow, using tools across several loops to complete a defined task.", example:"'Write me a report on X' → searches, reads, synthesises, formats", autonomy:"Moderate", human:"Human sets goal; agent chooses steps", risk:"Medium" },
-  { level:3, name:"Autonomous Agent", color:LEVEL_COLORS[3], desc:"An agent that can set sub-goals, handle unexpected states, and operate without human check-ins for extended periods.", example:"'Monitor this data feed and alert me if anomaly detected'", autonomy:"High", human:"Human sets objective only", risk:"High" },
-  { level:4, name:"Multi-Agent System", color:LEVEL_COLORS[4], desc:"A network of specialised agents that coordinate — one plans, others execute, one validates — all working toward a shared goal.", example:"Orchestrator agent routes tasks to code agent, research agent, and writer agent", autonomy:"Very High", human:"Human approves final output", risk:"Very High" },
-  { level:5, name:"Self-Improving", color:LEVEL_COLORS[5], desc:"A system that can modify its own prompts, tools, or sub-agents based on performance — learning from outcomes.", example:"Agent notices its research is poor → rewrites its own search instructions", autonomy:"Full", human:"Minimal — oversight only", risk:"Critical" },
-];
-
-const COMPONENTS = [
-  { id:"model", label:"Core Model", color:C.blue, desc:"The LLM at the centre — reasons, plans, generates text, decides which tools to call.", role:"Brain / Reasoner" },
-  { id:"tools", label:"Tool Layer", color:C.purple, desc:"The set of APIs, functions, and capabilities the agent can call — web search, code execution, file I/O.", role:"Hands / Actuators" },
-  { id:"memory", label:"Memory Layer", color:C.amber, desc:"In-context conversation + external retrieval (RAG) + episodic storage for persistence across sessions.", role:"Memory / State" },
-  { id:"orchestrator", label:"Orchestrator", color:C.green, desc:"Logic that decides when to loop, when to stop, how to handle errors, when to ask for human input.", role:"Director / Control flow" },
-  { id:"sandbox", label:"Execution Sandbox", color:C.accent, desc:"An isolated environment where code runs safely — contained from the host system to limit blast radius.", role:"Safety / Containment" },
-];
-
-const RISKS = [
-  { name:"Unintended Actions", color:C.red, level:"High", desc:"An agent with write access can create, overwrite, or delete real files and send real messages. Mistakes have real consequences.", mitigation:"Use read-only tools where possible; require confirmation for writes" },
-  { name:"Prompt Injection", color:C.amber, level:"Medium", desc:"Malicious content in tool outputs (web pages, documents) can hijack agent behaviour by embedding instructions.", mitigation:"Treat all external content as untrusted data; validate before acting" },
-  { name:"Goal Misalignment", color:C.red, level:"High", desc:"The agent optimises for the stated goal in unexpected ways — technically correct but not what the human meant.", mitigation:"Specify constraints, not just objectives; add human review checkpoints" },
-  { name:"Runaway Loops", color:C.amber, level:"Medium", desc:"Without a termination condition, agents can loop indefinitely, consuming resources or performing repeated actions.", mitigation:"Set explicit step limits and timeout conditions" },
-  { name:"Scope Creep", color:C.purple, level:"Medium", desc:"An autonomous agent may access or modify things outside its intended scope when pursuing a goal.", mitigation:"Apply least-privilege: minimum tool access needed for the task" },
-];
-
-function SectionConcept() {
-  return (
-    <div style={{display:"flex",flexDirection:"column",gap:16}}>
-      <Card accent={C.accent}>
-        <div style={{paddingTop:8}}>
-          <Tag color={C.accent}>DEFINITION</Tag>
-          <P style={{marginTop:12,fontSize:15,color:C.text,fontWeight:500,lineHeight:1.7}}>
-            An agentic system is an AI architecture where one or more models perceive their environment, plan actions, use tools, and iterate toward a goal — with varying degrees of autonomy and human involvement.
-          </P>
-        </div>
-      </Card>
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16}}>
-        <Card>
-          <H3 color={C.blue}>The Key Property</H3>
-          <P>Agenticity isn't binary — it's a spectrum from a single prompt-response to a fully autonomous multi-agent network. The key variable is how much the system decides for itself.</P>
-        </Card>
-        <Card>
-          <H3 color={C.purple}>Why It Matters Now</H3>
-          <P>As LLMs become more capable, the practical limit on what agents can do expands. What required a human operator in 2022 can now run autonomously at scale.</P>
-        </Card>
-      </div>
-      <Card style={{background:`${C.purple}06`,border:`1px solid ${C.purple}20`}}>
-        <Tag color={C.purple}>KEY INSIGHT</Tag>
-        <P style={{marginTop:8}}>Higher autonomy = higher leverage and higher risk. The design question isn't "how autonomous can we make this?" but "what level of autonomy matches the stakes of this task?"</P>
-      </Card>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>What is an Agentic System?</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background: #f8f8f6;
+      font-family: 'IBM Plex Sans', sans-serif;
+      color: #333;
+      padding: 40px 20px;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 30px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin-bottom: 12px;
+    }
+    .subtitle {
+      font-size: 15px;
+      color: #666;
+      margin-bottom: 32px;
+      line-height: 1.6;
+    }
+    .tabs {
+      display: flex;
+      gap: 0;
+      margin-bottom: 32px;
+      border-bottom: 1px solid #e5e5e0;
+      overflow-x: auto;
+    }
+    .tab {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 12px 16px;
+      cursor: pointer;
+      color: #666;
+      border: none;
+      background: none;
+      border-bottom: 2px solid transparent;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+    }
+    .tab:hover {
+      color: #333;
+    }
+    .tab.active {
+      color: #ea580c;
+      background: #ea580c08;
+      border-bottom: 2px solid #ea580c;
+    }
+    .sections {
+      position: relative;
+    }
+    .section {
+      display: none;
+    }
+    .section.active {
+      display: block;
+    }
+    .card {
+      background: white;
+      border: 1px solid #e5e5e0;
+      border-radius: 4px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+      padding: 24px;
+      margin-bottom: 20px;
+      position: relative;
+      padding-top: 28px;
+    }
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 3px;
+      width: 100%;
+      border-radius: 4px 4px 0 0;
+    }
+    .card.blue::before {
+      background: #0891b2;
+    }
+    .card.purple::before {
+      background: #7c3aed;
+    }
+    .card.green::before {
+      background: #16a34a;
+    }
+    .card.orange::before {
+      background: #ea580c;
+    }
+    .card h3 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+    .card p {
+      font-size: 14px;
+      line-height: 1.6;
+      color: #555;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    @media (max-width: 600px) {
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+    }
+    .level-buttons {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    .level-button {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 12px 8px;
+      border: 1px solid #e5e5e0;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: white;
+      color: #333;
+      text-align: center;
+    }
+    .level-button:hover {
+      border-color: #d0d0cb;
+    }
+    .level-button.active {
+      color: white;
+    }
+    .level-content {
+      display: none;
+    }
+    .level-content.active {
+      display: block;
+    }
+    .subtabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .subtab {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 8px 12px;
+      background: white;
+      border: 1px solid #e5e5e0;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .subtab:hover {
+      border-color: #d0d0cb;
+    }
+    .subtab.active {
+      background: #ea580c;
+      color: white;
+      border-color: #ea580c;
+    }
+    .subtab.blue.active {
+      background: #0891b2;
+      border-color: #0891b2;
+    }
+    .subtab-content {
+      display: none;
+    }
+    .subtab-content.active {
+      display: block;
+    }
+    .expand-card {
+      background: white;
+      border: 1px solid #e5e5e0;
+      border-radius: 4px;
+      padding: 20px;
+      margin-bottom: 16px;
+      cursor: pointer;
+      position: relative;
+      padding-left: 28px;
+      transition: box-shadow 0.2s ease;
+    }
+    .expand-card:hover {
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    }
+    .expand-card::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      border-radius: 4px 0 0 4px;
+    }
+    .expand-card.red::before {
+      background: #dc2626;
+    }
+    .expand-card.amber::before {
+      background: #ca8a04;
+    }
+    .expand-card.purple::before {
+      background: #7c3aed;
+    }
+    .expand-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .expand-subtitle {
+      font-size: 11px;
+      color: #999;
+      font-family: 'JetBrains Mono', monospace;
+      text-transform: uppercase;
+      float: right;
+      margin-bottom: 8px;
+    }
+    .expand-content {
+      font-size: 13px;
+      line-height: 1.5;
+      color: #666;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+      clear: both;
+    }
+    .expand-card.expanded .expand-content {
+      max-height: 400px;
+    }
+    .expand-icon {
+      font-size: 12px;
+      float: right;
+      transition: transform 0.3s ease;
+      clear: both;
+    }
+    .expand-card.expanded .expand-icon {
+      transform: rotate(180deg);
+    }
+    .arch-card {
+      background: white;
+      border: 1px solid #e5e5e0;
+      border-radius: 4px;
+      padding: 20px;
+      margin-bottom: 12px;
+      position: relative;
+      padding-left: 28px;
+    }
+    .arch-card::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      border-radius: 4px 0 0 4px;
+    }
+    .arch-card.blue::before {
+      background: #0891b2;
+    }
+    .arch-card.purple::before {
+      background: #7c3aed;
+    }
+    .arch-card.green::before {
+      background: #16a34a;
+    }
+    .arch-card.orange::before {
+      background: #ea580c;
+    }
+    .arch-card h4 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .arch-card p {
+      font-size: 13px;
+      line-height: 1.5;
+      color: #666;
+      margin-bottom: 8px;
+    }
+    .role-label {
+      font-size: 11px;
+      color: #999;
+      font-family: 'JetBrains Mono', monospace;
+      text-transform: uppercase;
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid #e5e5e0;
+    }
+    .footer {
+      margin-top: 48px;
+      padding-top: 24px;
+      border-top: 1px solid #e5e5e0;
+      font-size: 13px;
+      color: #999;
+      text-align: center;
+    }
+    .footer a {
+      color: #0891b2;
+      text-decoration: none;
+    }
+    .footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>What is an Agentic System?</h1>
+    <p class="subtitle">The full spectrum of AI autonomy — from single-turn responses to self-directing networks — and how to design them safely.</p>
+    
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab(0)">The Concept</button>
+      <button class="tab" onclick="switchTab(1)">Autonomy Levels</button>
+      <button class="tab" onclick="switchTab(2)">Architecture</button>
+      <button class="tab" onclick="switchTab(3)">Risks</button>
     </div>
-  );
-}
 
-function SectionLevels() {
-  const [active, setActive] = useState(2);
-  const lv = LEVELS[active];
-  return (
-    <div style={{display:"flex",flexDirection:"column",gap:16}}>
-      <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
-        {LEVELS.map((l,i) => (
-          <button key={i} onClick={() => setActive(i)} style={{fontFamily:font.mono,fontSize:11,fontWeight:active===i?600:400,color:active===i?"#fff":l.color,background:active===i?l.color:`${l.color}12`,border:`1px solid ${l.color}30`,borderRadius:3,padding:"5px 12px",cursor:"pointer",transition:"all 0.2s"}}>L{l.level}</button>
-        ))}
-      </div>
-      <Card accent={lv.color} style={{border:`2px solid ${lv.color}30`}}>
-        <div style={{paddingTop:8}}>
-          <div style={{display:"flex",gap:10,alignItems:"center",marginBottom:10}}>
-            <Tag color={lv.color}>LEVEL {lv.level}</Tag>
-            <H3 color={lv.color}>{lv.name}</H3>
+    <div class="sections">
+      <!-- Tab 0: The Concept -->
+      <div class="section active">
+        <div class="card orange">
+          <p><strong>An agentic system is an AI architecture where one or more models perceive their environment, plan actions, use tools, and iterate toward a goal — with varying degrees of autonomy and human involvement.</strong></p>
+        </div>
+
+        <div class="grid-2">
+          <div class="card blue">
+            <h3>The Key Property</h3>
+            <p>Agenticity isn't binary — it's a spectrum from a single prompt-response to a fully autonomous multi-agent network. The key variable is how much the system decides for itself.</p>
           </div>
-          <P style={{marginBottom:14}}>{lv.desc}</P>
-          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:12}}>
-            {[["EXAMPLE", lv.example, lv.color],["AUTONOMY", lv.autonomy, lv.color],["RISK", lv.risk, lv.risk==="Very Low"||lv.risk==="Low"?C.green:lv.risk==="Medium"?C.amber:C.red]].map(([label,val,col]) => (
-              <div key={label} style={{padding:12,background:`${col}05`,border:`1px solid ${col}15`,borderRadius:4}}>
-                <div style={{fontFamily:font.mono,fontSize:10,color:col,textTransform:"uppercase",letterSpacing:1,marginBottom:6}}>{label}</div>
-                <P style={{fontSize:12}}>{val}</P>
-              </div>
-            ))}
-          </div>
-          <div style={{marginTop:14,display:"flex",alignItems:"center",gap:6}}>
-            <div style={{fontFamily:font.mono,fontSize:10,color:C.muted,letterSpacing:1,textTransform:"uppercase",marginRight:4}}>HUMAN INVOLVEMENT</div>
-            <P style={{fontSize:12,color:lv.color,fontWeight:500}}>{lv.human}</P>
+          <div class="card purple">
+            <h3>Why It Matters Now</h3>
+            <p>As LLMs become more capable, the practical limit on what agents can do expands. What required a human operator in 2022 can now run autonomously at scale.</p>
           </div>
         </div>
-      </Card>
-    </div>
-  );
-}
 
-function SectionArchitecture() {
-  const [active, setActive] = useState(0);
-  const comp = COMPONENTS[active];
-  return (
-    <div style={{display:"flex",flexDirection:"column",gap:16}}>
-      <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
-        {COMPONENTS.map((c,i) => (
-          <button key={i} onClick={() => setActive(i)} style={{fontFamily:font.heading,fontSize:12,fontWeight:active===i?700:500,color:active===i?c.color:C.sub,background:active===i?`${c.color}08`:"transparent",border:`1px solid ${active===i?`${c.color}30`:"transparent"}`,borderRadius:4,padding:"8px 14px",cursor:"pointer",transition:"all 0.2s"}}>{c.label}</button>
-        ))}
-      </div>
-      <Card accent={comp.color} style={{border:`2px solid ${comp.color}30`}}>
-        <div style={{paddingTop:8}}>
-          <Tag color={comp.color}>{comp.label.toUpperCase()}</Tag>
-          <P style={{marginTop:10,marginBottom:12}}>{comp.desc}</P>
-          <div style={{padding:12,background:`${comp.color}05`,border:`1px solid ${comp.color}15`,borderRadius:4}}>
-            <div style={{fontFamily:font.mono,fontSize:10,color:comp.color,textTransform:"uppercase",letterSpacing:1,marginBottom:4}}>ROLE IN SYSTEM</div>
-            <P style={{fontSize:12.5,fontWeight:500,color:comp.color}}>{comp.role}</P>
-          </div>
+        <div class="card purple">
+          <p><strong>Higher autonomy = higher leverage and higher risk.</strong> The design question isn't 'how autonomous can we make this?' but 'what level of autonomy matches the stakes of this task?'</p>
         </div>
-      </Card>
-    </div>
-  );
-}
+      </div>
 
-function SectionRisks() {
-  const [open, setOpen] = useState(null);
-  return (
-    <div style={{display:"flex",flexDirection:"column",gap:12}}>
-      <P style={{marginBottom:4}}>The most important risks in agentic systems — and how to address them.</P>
-      {RISKS.map((r,i) => (
-        <Card key={i} onClick={() => setOpen(open===i?null:i)}
-          style={{border:open===i?`2px solid ${r.color}`:`1px solid ${C.border}`,padding:open===i?"16px 19px":20,transition:"all 0.2s"}}>
-          <div style={{display:"flex",alignItems:"center",gap:12}}>
-            <Tag color={r.color}>{r.level}</Tag>
-            <H3 color={open===i?r.color:C.text}>{r.name}</H3>
-            <span style={{fontFamily:font.mono,fontSize:11,color:C.muted,marginLeft:"auto"}}>{open===i?"▲":"▼"}</span>
-          </div>
-          {open===i && (
-            <div style={{marginTop:12,display:"flex",flexDirection:"column",gap:10}}>
-              <P>{r.desc}</P>
-              <div style={{padding:10,background:`${C.green}05`,border:`1px solid ${C.green}15`,borderRadius:4}}>
-                <div style={{fontFamily:font.mono,fontSize:10,color:C.green,textTransform:"uppercase",letterSpacing:1,marginBottom:4}}>MITIGATION</div>
-                <P style={{fontSize:12.5}}>{r.mitigation}</P>
-              </div>
+      <!-- Tab 1: Autonomy Levels -->
+      <div class="section">
+        <div class="level-buttons">
+          <button class="level-button active" style="background: #94a3b8; color: white;" onclick="switchLevel(event, 0)">L0</button>
+          <button class="level-button" style="border-color: #0891b2; color: #0891b2;" onclick="switchLevel(event, 1)">L1</button>
+          <button class="level-button" style="border-color: #ca8a04; color: #ca8a04;" onclick="switchLevel(event, 2)">L2</button>
+          <button class="level-button" style="border-color: #ea580c; color: #ea580c;" onclick="switchLevel(event, 3)">L3</button>
+          <button class="level-button" style="border-color: #dc2626; color: #dc2626;" onclick="switchLevel(event, 4)">L4</button>
+          <button class="level-button" style="border-color: #7c3aed; color: #7c3aed;" onclick="switchLevel(event, 5)">L5</button>
+        </div>
+
+        <div class="level-content active">
+          <div class="card" style="position: relative; padding-top: 28px;"><div style="position: absolute; top: 0; left: 0; height: 3px; width: 100%; background: #94a3b8; border-radius: 4px 4px 0 0;"></div>
+            <h3>L0: Simple Responder</h3>
+            <p>A model that responds to a single prompt with no tools, no memory, no follow-up.</p>
+            <p style="margin-top: 12px;"><strong>Example:</strong> "What's the capital of France?" → "Paris"</p>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 16px; font-size: 12px;">
+              <div><span style="color: #999; text-transform: uppercase;">Autonomy</span><br><strong>None</strong></div>
+              <div><span style="color: #999; text-transform: uppercase;">Human</span><br><strong>100% of decisions</strong></div>
+              <div><span style="color: #999; text-transform: uppercase;">Risk</span><br><strong>Very Low</strong></div>
             </div>
-          )}
-        </Card>
-      ))}
-    </div>
-  );
-}
+          </div>
+        </div>
 
-export default function AgenticExplainer() {
-  const [tab, setTab] = useState(0);
-  const TABS = ["The Concept","Autonomy Levels","Architecture","Risks"];
-  const sections = [<SectionConcept/>,<SectionLevels/>,<SectionArchitecture/>,<SectionRisks/>];
-  return (
-    <div style={{background:C.bg,minHeight:"100vh",fontFamily:font.body,color:C.text}}>
-      <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
-      <div style={{padding:"32px 24px 0",maxWidth:800,margin:"0 auto"}}>
-        <span style={{fontFamily:font.mono,fontSize:11,color:C.accent,background:`${C.accent}10`,padding:"2px 10px",borderRadius:3,letterSpacing:2,textTransform:"uppercase"}}>Visual Explainer</span>
-        <h1 style={{fontFamily:font.heading,fontSize:30,fontWeight:700,color:C.text,margin:"8px 0 4px",lineHeight:1.2,letterSpacing:-0.5}}>What is an Agentic System?</h1>
-        <P>The full spectrum of AI autonomy — from single-turn responses to self-directing networks — and how to design them safely.</P>
+        <div class="level-content">
+          <div class="card blue">
+            <h3>L1: Tool-Augmented</h3>
+            <p>A model that can call a predefined set of tools (search, calculator) within a single response turn.</p>
+            <p style="margin-top: 12px;"><strong>Example:</strong> Weather query → calls weather API → returns current temp</p>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 16px; font-size: 12px;">
+              <div><span style="color: #999; text-transform: uppercase;">Autonomy</span><br><strong>Minimal</strong></div>
+              <div><span style="color: #999; text-transform: uppercase;">Human</span><br><strong>All goals set</strong></div>
+              <div><span style="color: #999; text-transform: uppercase;">Risk</span><br><strong>Low</strong></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="level-content">
+          <div class="card" style="position: relative; padding-top: 28px;"><div style="position: absolute; top: 0; left: 0; height: 3px; width: 100%; background: #ca8a04; border-radius: 4px 4px 0 0;"></div>
+            <h3>L2: Workflow Agent</h3>
+            <p>An agent that executes a multi-step workflow, using tools across several loops to complete a defined task.</p>
+            <p style="margin-top: 12px;"><strong>Example:</strong> "Write me a report on X" → searches, reads, synthesises, formats</p>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 16px; font-size: 12px;">
+              <div><span style="color: #999; text-transform: uppercase;">Autonomy</span><br><strong>Moderate</strong></div>
+              <div><span style="color: #999; text-transform: uppercase;">Human</span><br><strong>Sets goal; chooses steps</strong></div>
+              <div><span style="color: #999; text-transform: uppercase;">Risk</span><br><strong>Medium</strong></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="level-content">
+          <div class="card orange">
+            <h3>L3: Autonomous Agent</h3>
+            <p>An agent that can set sub-goals, handle unexpected states, and operate without human check-ins for extended periods.</p>
+            <p style="margin-top: 12px;"><strong>Example:</strong> "Monitor this data feed and alert me if anomaly detected"</p>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 16px; font-size: 12px;">
+              <div><span style="color: #999; text-transform: uppercase;">Autonomy</span><br><strong>High</strong></div>
+              <div><span style="color: #999; text-transform: uppercase;">Human</span><br><strong>Sets objective only</strong></div>
+              <div><span style="color: #999; text-transform: uppercase;">Risk</span><br><strong>High</strong></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="level-content">
+          <div class="card" style="position: relative; padding-top: 28px;"><div style="position: absolute; top: 0; left: 0; height: 3px; width: 100%; background: #dc2626; border-radius: 4px 4px 0 0;"></div>
+            <h3>L4: Multi-Agent</h3>
+            <p>A network of specialised agents that coordinate — one plans, others execute, one validates — all working toward a shared goal.</p>
+            <p style="margin-top: 12px;"><strong>Example:</strong> Orchestrator routes tasks to code agent, research agent, and writer agent</p>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 16px; font-size: 12px;">
+              <div><span style="color: #999; text-transform: uppercase;">Autonomy</span><br><strong>Very High</strong></div>
+              <div><span style="color: #999; text-transform: uppercase;">Human</span><br><strong>Approves output</strong></div>
+              <div><span style="color: #999; text-transform: uppercase;">Risk</span><br><strong>Very High</strong></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="level-content">
+          <div class="card purple">
+            <h3>L5: Self-Improving</h3>
+            <p>A system that can modify its own prompts, tools, or sub-agents based on performance — learning from outcomes.</p>
+            <p style="margin-top: 12px;"><strong>Example:</strong> Agent notices its research is poor → rewrites its own search instructions</p>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 16px; font-size: 12px;">
+              <div><span style="color: #999; text-transform: uppercase;">Autonomy</span><br><strong>Full</strong></div>
+              <div><span style="color: #999; text-transform: uppercase;">Human</span><br><strong>Oversight only</strong></div>
+              <div><span style="color: #999; text-transform: uppercase;">Risk</span><br><strong>Critical</strong></div>
+            </div>
+          </div>
+        </div>
       </div>
-      <div style={{maxWidth:800,margin:"20px auto 0",padding:"0 24px",display:"flex",gap:4,flexWrap:"wrap"}}>
-        {TABS.map((t,i) => (<button key={i} onClick={() => setTab(i)} style={{fontFamily:font.heading,fontSize:12,fontWeight:tab===i?700:500,color:tab===i?C.accent:C.sub,background:tab===i?`${C.accent}08`:"transparent",border:`1px solid ${tab===i?`${C.accent}30`:"transparent"}`,borderRadius:4,padding:"8px 14px",cursor:"pointer",transition:"all 0.2s"}}>{t}</button>))}
+
+      <!-- Tab 2: Architecture -->
+      <div class="section">
+        <div class="subtabs">
+          <button class="subtab blue active" onclick="switchSubtab(event, 0)">Core Model</button>
+          <button class="subtab purple" onclick="switchSubtab(event, 1)">Tool Layer</button>
+          <button class="subtab orange" onclick="switchSubtab(event, 2)">Memory Layer</button>
+          <button class="subtab green" onclick="switchSubtab(event, 3)">Orchestrator</button>
+          <button class="subtab orange" onclick="switchSubtab(event, 4)">Sandbox</button>
+        </div>
+
+        <div class="subtab-content active">
+          <div class="arch-card blue">
+            <h4>Core Model</h4>
+            <p>The LLM at the centre — reasons, plans, generates text, decides which tools to call.</p>
+            <div class="role-label">Role: Brain / Reasoner</div>
+          </div>
+        </div>
+
+        <div class="subtab-content">
+          <div class="arch-card purple">
+            <h4>Tool Layer</h4>
+            <p>The set of APIs, functions, and capabilities the agent can call — web search, code execution, file I/O.</p>
+            <div class="role-label">Role: Hands / Actuators</div>
+          </div>
+        </div>
+
+        <div class="subtab-content">
+          <div class="arch-card orange">
+            <h4>Memory Layer</h4>
+            <p>In-context conversation + external retrieval (RAG) + episodic storage for persistence across sessions.</p>
+            <div class="role-label">Role: Memory / State</div>
+          </div>
+        </div>
+
+        <div class="subtab-content">
+          <div class="arch-card green">
+            <h4>Orchestrator</h4>
+            <p>Logic that decides when to loop, when to stop, how to handle errors, when to ask for human input.</p>
+            <div class="role-label">Role: Director / Control flow</div>
+          </div>
+        </div>
+
+        <div class="subtab-content">
+          <div class="arch-card orange">
+            <h4>Execution Sandbox</h4>
+            <p>An isolated environment where code runs safely — contained from the host system to limit blast radius.</p>
+            <div class="role-label">Role: Safety / Containment</div>
+          </div>
+        </div>
       </div>
-      <div style={{maxWidth:800,margin:"16px auto 40px",padding:"0 24px"}}>{sections[tab]}</div>
-      <div style={{maxWidth:800,margin:"0 auto",padding:"16px 24px 32px",borderTop:`1px solid ${C.border}`}}>
-        <P style={{fontSize:11,color:C.muted,textAlign:"center"}}><a href="ai-memory.html" style={{color:C.accent,textDecoration:"none"}}>← AI Memory</a> · <a href="index.html" style={{color:C.accent,textDecoration:"none"}}>AI Concepts Series</a> · <a href="semantics.html" style={{color:C.accent,textDecoration:"none"}}>Semantics →</a></P>
+
+      <!-- Tab 3: Risks -->
+      <div class="section">
+        <div class="expand-card red">
+          <span class="expand-subtitle">High</span>
+          <span class="expand-icon">▼</span>
+          <div class="expand-title">Unintended Actions</div>
+          <div class="expand-content">An agent with write access can create, overwrite, or delete real files and send real messages. Mistakes have real consequences. <strong>Mitigation:</strong> Use read-only tools where possible; require confirmation for writes</div>
+        </div>
+
+        <div class="expand-card amber">
+          <span class="expand-subtitle">Medium</span>
+          <span class="expand-icon">▼</span>
+          <div class="expand-title">Prompt Injection</div>
+          <div class="expand-content">Malicious content in tool outputs (web pages, documents) can hijack agent behaviour by embedding instructions. <strong>Mitigation:</strong> Treat all external content as untrusted data; validate before acting</div>
+        </div>
+
+        <div class="expand-card red">
+          <span class="expand-subtitle">High</span>
+          <span class="expand-icon">▼</span>
+          <div class="expand-title">Goal Misalignment</div>
+          <div class="expand-content">The agent optimises for the stated goal in unexpected ways — technically correct but not what the human meant. <strong>Mitigation:</strong> Specify constraints, not just objectives; add human review checkpoints</div>
+        </div>
+
+        <div class="expand-card amber">
+          <span class="expand-subtitle">Medium</span>
+          <span class="expand-icon">▼</span>
+          <div class="expand-title">Runaway Loops</div>
+          <div class="expand-content">Without a termination condition, agents can loop indefinitely, consuming resources or performing repeated actions. <strong>Mitigation:</strong> Set explicit step limits and timeout conditions</div>
+        </div>
+
+        <div class="expand-card purple">
+          <span class="expand-subtitle">Medium</span>
+          <span class="expand-icon">▼</span>
+          <div class="expand-title">Scope Creep</div>
+          <div class="expand-content">An autonomous agent may access or modify things outside its intended scope when pursuing a goal. <strong>Mitigation:</strong> Apply least-privilege: minimum tool access needed for the task</div>
+        </div>
       </div>
     </div>
-  );
-}
-ReactDOM.createRoot(document.getElementById('root')).render(<AgenticExplainer/>);
-</script></body></html>
+
+    <div class="footer">
+      ← <a href="ai-memory.html">AI Memory</a> · <a href="index.html">AI Concepts Series</a> · <a href="semantics.html">Semantics</a> →
+    </div>
+  </div>
+
+  <script>
+    function switchTab(i) {
+      document.querySelectorAll('.tab').forEach((t, j) => {
+        t.classList.toggle('active', i === j);
+      });
+      document.querySelectorAll('.section').forEach((s, j) => {
+        s.classList.toggle('active', i === j);
+      });
+    }
+
+    function switchLevel(event, i) {
+      const container = event.target.parentElement;
+      container.querySelectorAll('.level-button').forEach((t, j) => {
+        t.classList.toggle('active', i === j);
+        if (i === j) {
+          t.style.backgroundColor = window.getComputedStyle(t).borderColor;
+          t.style.color = 'white';
+        } else {
+          const colors = ['#94a3b8', '#0891b2', '#ca8a04', '#ea580c', '#dc2626', '#7c3aed'];
+          const colorMap = {
+            0: '#94a3b8', 1: '#0891b2', 2: '#ca8a04', 3: '#ea580c', 4: '#dc2626', 5: '#7c3aed'
+          };
+          t.style.backgroundColor = 'white';
+          t.style.borderColor = colorMap[j];
+          t.style.color = colorMap[j];
+        }
+      });
+      container.parentElement.querySelectorAll('.level-content').forEach((s, j) => {
+        s.classList.toggle('active', i === j);
+      });
+    }
+
+    function switchSubtab(event, i) {
+      const container = event.target.parentElement;
+      container.querySelectorAll('.subtab').forEach((t, j) => {
+        t.classList.toggle('active', i === j);
+      });
+      container.parentElement.querySelectorAll('.subtab-content').forEach((s, j) => {
+        s.classList.toggle('active', i === j);
+      });
+    }
+
+    document.querySelectorAll('.expand-card').forEach(card => {
+      card.addEventListener('click', function() {
+        this.classList.toggle('expanded');
+      });
+    });
+  </script>
+</body>
+</html>

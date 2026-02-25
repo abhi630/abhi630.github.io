@@ -1,262 +1,658 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>What are AI Agents? — Visual Explainer</title>
-<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-<style>*{box-sizing:border-box;margin:0;padding:0}body{background:#f8f8f6}</style>
-</head><body><div id="root"></div>
-<script type="text/babel">
-const { useState } = React;
-const C = { bg:"#f8f8f6",card:"#fff",border:"#e5e5e0",text:"#222",sub:"#666",muted:"#999",accent:"#ea580c",blue:"#0891b2",purple:"#7c3aed",green:"#16a34a",amber:"#ca8a04",red:"#dc2626" };
-const font = { heading:"'Space Grotesk', sans-serif", body:"'IBM Plex Sans', sans-serif", mono:"'JetBrains Mono', monospace" };
-const Card = ({ children, style, accent, onClick }) => (
-  <div onClick={onClick} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:4,padding:20,position:"relative",overflow:"hidden",boxShadow:"0 1px 3px rgba(0,0,0,0.04)",cursor:onClick?"pointer":"default",...style}}>
-    {accent && <div style={{position:"absolute",top:0,left:0,right:0,height:3,background:accent}}/>}
-    {children}
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>What are AI Agents?</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background: #f8f8f6;
+      font-family: 'IBM Plex Sans', sans-serif;
+      color: #333;
+      padding: 40px 20px;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 30px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin-bottom: 12px;
+    }
+    .subtitle {
+      font-size: 15px;
+      color: #666;
+      margin-bottom: 32px;
+      line-height: 1.6;
+    }
+    .tabs {
+      display: flex;
+      gap: 0;
+      margin-bottom: 32px;
+      border-bottom: 1px solid #e5e5e0;
+      overflow-x: auto;
+    }
+    .tab {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 12px 16px;
+      cursor: pointer;
+      color: #666;
+      border: none;
+      background: none;
+      border-bottom: 2px solid transparent;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+    }
+    .tab:hover {
+      color: #333;
+    }
+    .tab.active {
+      color: #ea580c;
+      background: #ea580c08;
+      border-bottom: 2px solid #ea580c;
+    }
+    .sections {
+      position: relative;
+    }
+    .section {
+      display: none;
+    }
+    .section.active {
+      display: block;
+    }
+    .card {
+      background: white;
+      border: 1px solid #e5e5e0;
+      border-radius: 4px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+      padding: 24px;
+      margin-bottom: 20px;
+      position: relative;
+      padding-top: 28px;
+    }
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 3px;
+      width: 100%;
+      border-radius: 4px 4px 0 0;
+    }
+    .card.blue::before {
+      background: #0891b2;
+    }
+    .card.purple::before {
+      background: #7c3aed;
+    }
+    .card.green::before {
+      background: #16a34a;
+    }
+    .card.orange::before {
+      background: #ea580c;
+    }
+    .card.amber::before {
+      background: #ca8a04;
+    }
+    .card h3 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+    .card p {
+      font-size: 14px;
+      line-height: 1.6;
+      color: #555;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    @media (max-width: 600px) {
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+    }
+    .expand-card {
+      background: white;
+      border: 1px solid #e5e5e0;
+      border-radius: 4px;
+      padding: 20px;
+      margin-bottom: 16px;
+      cursor: pointer;
+      position: relative;
+      padding-left: 28px;
+      transition: box-shadow 0.2s ease;
+    }
+    .expand-card:hover {
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    }
+    .expand-card::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      border-radius: 4px 0 0 4px;
+    }
+    .expand-card.blue::before {
+      background: #0891b2;
+    }
+    .expand-card.purple::before {
+      background: #7c3aed;
+    }
+    .expand-card.green::before {
+      background: #16a34a;
+    }
+    .expand-card.orange::before {
+      background: #ea580c;
+    }
+    .expand-card.amber::before {
+      background: #ca8a04;
+    }
+    .expand-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .expand-content {
+      font-size: 13px;
+      line-height: 1.5;
+      color: #666;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+    }
+    .expand-card.expanded .expand-content {
+      max-height: 300px;
+    }
+    .expand-icon {
+      font-size: 12px;
+      float: right;
+      transition: transform 0.3s ease;
+    }
+    .expand-card.expanded .expand-icon {
+      transform: rotate(180deg);
+    }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    @media (max-width: 600px) {
+      .grid-3 {
+        grid-template-columns: 1fr;
+      }
+    }
+    .subtabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .subtab {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 8px 12px;
+      background: white;
+      border: 1px solid #e5e5e0;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .subtab:hover {
+      border-color: #d0d0cb;
+    }
+    .subtab.active {
+      background: #ea580c;
+      color: white;
+      border-color: #ea580c;
+    }
+    .subtab.blue.active {
+      background: #0891b2;
+      border-color: #0891b2;
+    }
+    .subtab.purple.active {
+      background: #7c3aed;
+      border-color: #7c3aed;
+    }
+    .subtab.green.active {
+      background: #16a34a;
+      border-color: #16a34a;
+    }
+    .subtab.amber.active {
+      background: #ca8a04;
+      border-color: #ca8a04;
+    }
+    .subtab-content {
+      display: none;
+    }
+    .subtab-content.active {
+      display: block;
+    }
+    .metric {
+      background: #f8f8f6;
+      padding: 12px;
+      border-radius: 3px;
+      margin-top: 12px;
+    }
+    .metric-label {
+      font-size: 11px;
+      color: #999;
+      font-family: 'JetBrains Mono', monospace;
+      text-transform: uppercase;
+    }
+    .metric-value {
+      font-size: 16px;
+      font-weight: 600;
+      color: #333;
+    }
+    .comparison-row {
+      padding: 16px;
+      border-bottom: 1px solid #e5e5e0;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .comparison-row:last-child {
+      border-bottom: none;
+    }
+    .comparison-label {
+      font-size: 12px;
+      color: #999;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .comparison-value {
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .footer {
+      margin-top: 48px;
+      padding-top: 24px;
+      border-top: 1px solid #e5e5e0;
+      font-size: 13px;
+      color: #999;
+      text-align: center;
+    }
+    .footer a {
+      color: #0891b2;
+      text-decoration: none;
+    }
+    .footer a:hover {
+      text-decoration: underline;
+    }
+    .mark {
+      font-size: 16px;
+      margin-right: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>What are AI Agents?</h1>
+    <p class="subtitle">AI that doesn't just answer — it acts. The loop, the tools, and why agents are a fundamentally different kind of system.</p>
+    
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab(0)">The Concept</button>
+      <button class="tab" onclick="switchTab(1)">Agent Loop</button>
+      <button class="tab" onclick="switchTab(2)">Tool Types</button>
+      <button class="tab" onclick="switchTab(3)">vs Chatbot</button>
+      <button class="tab" onclick="switchTab(4)">Real Examples</button>
+    </div>
+
+    <div class="sections">
+      <!-- Tab 0: The Concept -->
+      <div class="section active">
+        <div class="card green">
+          <p><strong>An AI agent is an AI that can take actions in the world — not just generate text. It perceives its environment, makes decisions, uses tools, and loops until a goal is accomplished.</strong></p>
+        </div>
+
+        <div class="grid-2">
+          <div class="card blue">
+            <h3>The Analogy</h3>
+            <p>A chatbot is like asking someone a question. An AI agent is like hiring an assistant who goes off, does the work — researching, writing, sending — and returns with the finished result.</p>
+          </div>
+          <div class="card purple">
+            <h3>The Key Shift</h3>
+            <p>Traditional software follows fixed rules. An agent reasons about what to do next, adapts when things change, and uses judgment — not just instructions — to reach its goal.</p>
+          </div>
+        </div>
+
+        <div class="card purple">
+          <p><strong>The agent loop — perceive, plan, act, observe — is the defining pattern.</strong> Everything else (tools, memory, multi-agent systems) is built on top of this core loop.</p>
+        </div>
+      </div>
+
+      <!-- Tab 1: Agent Loop -->
+      <div class="section">
+        <div class="expand-card blue">
+          <span class="expand-icon">▼</span>
+          <div class="expand-title">1. Perceive</div>
+          <div class="expand-content">The agent reads the goal, environment, any tool outputs, and prior steps — building a full picture of current state. Context accumulates with each loop. By step 3, the agent has a rich model of what's been tried, what worked, and what's still needed.</div>
+        </div>
+
+        <div class="expand-card purple">
+          <span class="expand-icon">▼</span>
+          <div class="expand-title">2. Plan</div>
+          <div class="expand-content">Using reasoning, the agent decides what action to take next: which tool, what inputs, whether to decompose the task further. Planning quality determines everything. A good agent knows when to ask for clarification, when to simplify, and when a sub-agent would be faster.</div>
+        </div>
+
+        <div class="expand-card amber">
+          <span class="expand-icon">▼</span>
+          <div class="expand-title">3. Act</div>
+          <div class="expand-content">The agent calls a tool or executes a step — browsing the web, writing code, reading a file, or sending a request. The action is real and consequential — a file gets written, an email gets sent, code gets executed. This distinguishes agents from chatbots.</div>
+        </div>
+
+        <div class="expand-card green">
+          <span class="expand-icon">▼</span>
+          <div class="expand-title">4. Observe</div>
+          <div class="expand-content">The result comes back. The agent reads it, updates its understanding, and decides whether the task is done or another loop is needed. Observing isn't just reading output. A skilled agent catches unexpected results, adapts its plan, and decides whether to retry or escalate.</div>
+        </div>
+
+        <div class="expand-card orange">
+          <span class="expand-icon">▼</span>
+          <div class="expand-title">5. Done / Loop</div>
+          <div class="expand-content">If the goal is met, the agent reports back. If not, it loops again — re-planning with the new information from the last action. Most real tasks take 3–10 loops. Simple tasks take 1. Complex tasks (build a report) can take 20+.</div>
+        </div>
+      </div>
+
+      <!-- Tab 2: Tool Types -->
+      <div class="section">
+        <div class="subtabs">
+          <button class="subtab blue active" onclick="switchSubtab(event, 0)">Web Search</button>
+          <button class="subtab purple" onclick="switchSubtab(event, 1)">Code Execution</button>
+          <button class="subtab amber" onclick="switchSubtab(event, 2)">File System</button>
+          <button class="subtab green" onclick="switchSubtab(event, 3)">External APIs</button>
+          <button class="subtab orange" onclick="switchSubtab(event, 4)">Memory/RAG</button>
+        </div>
+
+        <div class="subtab-content active">
+          <div class="card blue">
+            <h3>Web Search</h3>
+            <p><strong>Browse live web pages, search for current information, read articles.</strong></p>
+            <p style="margin-top: 12px; color: #666;"><strong>Why it matters:</strong> Agents can research anything in real-time, not just from training data.</p>
+            <p style="margin-top: 12px; color: #666;"><strong>Use cases:</strong></p>
+            <ul style="margin-left: 20px; margin-top: 8px; color: #666;">
+              <li>Competitive research</li>
+              <li>Fact checking current events</li>
+              <li>Finding documentation</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="subtab-content">
+          <div class="card purple">
+            <h3>Code Execution</h3>
+            <p><strong>Write and run Python, JavaScript, shell in sandboxed environments.</strong></p>
+            <p style="margin-top: 12px; color: #666;"><strong>Why it matters:</strong> Turns ideas into actions — analysis, file processing, calculations, automations.</p>
+            <p style="margin-top: 12px; color: #666;"><strong>Use cases:</strong></p>
+            <ul style="margin-left: 20px; margin-top: 8px; color: #666;">
+              <li>Data analysis</li>
+              <li>Generating charts</li>
+              <li>Processing large files</li>
+              <li>Running tests</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="subtab-content">
+          <div class="card amber">
+            <h3>File System</h3>
+            <p><strong>Read, write, move files — PDFs, spreadsheets, images, documents.</strong></p>
+            <p style="margin-top: 12px; color: #666;"><strong>Why it matters:</strong> Work with real documents on disk, not just pasted text.</p>
+            <p style="margin-top: 12px; color: #666;"><strong>Use cases:</strong></p>
+            <ul style="margin-left: 20px; margin-top: 8px; color: #666;">
+              <li>Batch document processing</li>
+              <li>Report generation</li>
+              <li>Data extraction from PDFs</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="subtab-content">
+          <div class="card green">
+            <h3>External APIs</h3>
+            <p><strong>Connect to any service with an API — Slack, email, calendar, databases.</strong></p>
+            <p style="margin-top: 12px; color: #666;"><strong>Why it matters:</strong> An agent with API access can interact with any digital system.</p>
+            <p style="margin-top: 12px; color: #666;"><strong>Use cases:</strong></p>
+            <ul style="margin-left: 20px; margin-top: 8px; color: #666;">
+              <li>Sending notifications</li>
+              <li>CRM updates</li>
+              <li>Calendar scheduling</li>
+              <li>Order processing</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="subtab-content">
+          <div class="card orange">
+            <h3>Memory / RAG</h3>
+            <p><strong>Retrieve relevant info from a knowledge base or past conversations.</strong></p>
+            <p style="margin-top: 12px; color: #666;"><strong>Why it matters:</strong> Grounds the agent in your specific domain, not just general training.</p>
+            <p style="margin-top: 12px; color: #666;"><strong>Use cases:</strong></p>
+            <ul style="margin-left: 20px; margin-top: 8px; color: #666;">
+              <li>Personalised responses</li>
+              <li>Company knowledge lookup</li>
+              <li>Past conversation recall</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 3: vs Chatbot -->
+      <div class="section">
+        <div class="grid-2">
+          <div style="border: 1px solid #e5e5e0; border-radius: 4px; overflow: hidden;">
+            <div style="background: #fff; padding: 16px; border-bottom: 1px solid #e5e5e0;">
+              <h3 style="font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 600; margin: 0;">Chatbot</h3>
+            </div>
+            <div class="comparison-row">
+              <div>
+                <div class="comparison-label">Scope</div>
+                <div class="comparison-value"><span class="mark">✗</span> Answers one question at a time</div>
+              </div>
+            </div>
+            <div class="comparison-row">
+              <div>
+                <div class="comparison-label">Action</div>
+                <div class="comparison-value"><span class="mark">✗</span> Generates text only</div>
+              </div>
+            </div>
+            <div class="comparison-row">
+              <div>
+                <div class="comparison-label">Memory</div>
+                <div class="comparison-value"><span class="mark">✗</span> Forgets between turns</div>
+              </div>
+            </div>
+            <div class="comparison-row">
+              <div>
+                <div class="comparison-label">Tools</div>
+                <div class="comparison-value"><span class="mark">✗</span> No external access</div>
+              </div>
+            </div>
+            <div class="comparison-row">
+              <div>
+                <div class="comparison-label">Loop</div>
+                <div class="comparison-value"><span class="mark">✗</span> One response per prompt</div>
+              </div>
+            </div>
+            <div class="comparison-row">
+              <div>
+                <div class="comparison-label">Effort</div>
+                <div class="comparison-value"><span class="mark">✗</span> You do the follow-up work</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="border: 1px solid #e5e5e0; border-radius: 4px; overflow: hidden; border-top: 3px solid #16a34a;">
+            <div style="background: #fff; padding: 16px; border-bottom: 1px solid #e5e5e0;">
+              <h3 style="font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 600; margin: 0; color: #16a34a;">Agent</h3>
+            </div>
+            <div class="comparison-row">
+              <div>
+                <div class="comparison-label">Scope</div>
+                <div class="comparison-value"><span class="mark" style="color: #16a34a;">✓</span> Completes multi-step tasks end-to-end</div>
+              </div>
+            </div>
+            <div class="comparison-row">
+              <div>
+                <div class="comparison-label">Action</div>
+                <div class="comparison-value"><span class="mark" style="color: #16a34a;">✓</span> Executes real actions in the world</div>
+              </div>
+            </div>
+            <div class="comparison-row">
+              <div>
+                <div class="comparison-label">Memory</div>
+                <div class="comparison-value"><span class="mark" style="color: #16a34a;">✓</span> Maintains state across all steps</div>
+              </div>
+            </div>
+            <div class="comparison-row">
+              <div>
+                <div class="comparison-label">Tools</div>
+                <div class="comparison-value"><span class="mark" style="color: #16a34a;">✓</span> Uses web, code, files, APIs</div>
+              </div>
+            </div>
+            <div class="comparison-row">
+              <div>
+                <div class="comparison-label">Loop</div>
+                <div class="comparison-value"><span class="mark" style="color: #16a34a;">✓</span> Loops until goal is achieved</div>
+              </div>
+            </div>
+            <div class="comparison-row">
+              <div>
+                <div class="comparison-label">Effort</div>
+                <div class="comparison-value"><span class="mark" style="color: #16a34a;">✓</span> Handles follow-up autonomously</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 4: Real Examples -->
+      <div class="section">
+        <div class="subtabs">
+          <button class="subtab blue active" onclick="switchSubtab(event, 0)">Market Research</button>
+          <button class="subtab purple" onclick="switchSubtab(event, 1)">Inbox Triage</button>
+          <button class="subtab amber" onclick="switchSubtab(event, 2)">Data Pipeline</button>
+        </div>
+
+        <div class="subtab-content active">
+          <div class="card blue">
+            <h3>Market Research</h3>
+            <ol style="margin-left: 20px; color: #555; line-height: 1.8; margin-top: 12px;">
+              <li>Search web for competitor pricing pages</li>
+              <li>Read and extract pricing tiers from each site</li>
+              <li>Run code to generate comparison table</li>
+              <li>Write summary report and export as PDF</li>
+            </ol>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px;">
+              <div class="metric">
+                <div class="metric-label">Agent Time</div>
+                <div class="metric-value">~3 min</div>
+              </div>
+              <div class="metric">
+                <div class="metric-label">Manual Equivalent</div>
+                <div class="metric-value">~2 hrs</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="subtab-content">
+          <div class="card purple">
+            <h3>Inbox Triage</h3>
+            <ol style="margin-left: 20px; color: #555; line-height: 1.8; margin-top: 12px;">
+              <li>Read unread emails from last 24h</li>
+              <li>Classify each by urgency and topic</li>
+              <li>Draft reply for each action-needed email</li>
+              <li>Add flagged items to task list</li>
+            </ol>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px;">
+              <div class="metric">
+                <div class="metric-label">Agent Time</div>
+                <div class="metric-value">~1 min</div>
+              </div>
+              <div class="metric">
+                <div class="metric-label">Manual Equivalent</div>
+                <div class="metric-value">~30 min</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="subtab-content">
+          <div class="card amber">
+            <h3>Data Pipeline</h3>
+            <ol style="margin-left: 20px; color: #555; line-height: 1.8; margin-top: 12px;">
+              <li>Pull data from database API</li>
+              <li>Clean and normalise with Python</li>
+              <li>Generate charts and summary stats</li>
+              <li>Update dashboard and notify team</li>
+            </ol>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px;">
+              <div class="metric">
+                <div class="metric-label">Agent Time</div>
+                <div class="metric-value">~2 min</div>
+              </div>
+              <div class="metric">
+                <div class="metric-label">Manual Equivalent</div>
+                <div class="metric-value">~1 hr</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      ← <a href="claude.html">Claude</a> · <a href="index.html">AI Concepts Series</a> · <a href="claude-cowork.html">Claude Cowork</a> →
+    </div>
   </div>
-);
-const Tag = ({ color, children }) => (
-  <span style={{fontFamily:font.mono,fontSize:11,color,background:`${color}12`,border:`1px solid ${color}30`,padding:"2px 10px",borderRadius:3,letterSpacing:0.5,display:"inline-block"}}>{children}</span>
-);
-const H2 = ({ children }) => <h2 style={{fontFamily:font.heading,fontSize:22,fontWeight:700,color:C.text,margin:"0 0 6px"}}>{children}</h2>;
-const H3 = ({ children, color }) => <h3 style={{fontFamily:font.heading,fontSize:16,fontWeight:700,color:color||C.text,margin:"0 0 8px"}}>{children}</h3>;
-const P = ({ children, style }) => <p style={{fontFamily:font.body,fontSize:13.5,color:C.sub,lineHeight:1.65,margin:0,...style}}>{children}</p>;
 
-const LOOP_STEPS = [
-  { n:1, label:"Perceive", icon:"👁", detail:"The agent reads the goal, the environment, any tool outputs, and prior steps — building a full picture of the current state.", color:C.blue },
-  { n:2, label:"Plan", icon:"🧠", detail:"Using reasoning, the agent decides what action to take next: which tool, what inputs, whether to decompose the task further.", color:C.purple },
-  { n:3, label:"Act", icon:"⚡", detail:"The agent calls a tool or executes a step — browsing the web, writing code, reading a file, or sending a request.", color:C.amber },
-  { n:4, label:"Observe", icon:"📊", detail:"The result comes back. The agent reads it, updates its understanding, and decides whether the task is done or another loop is needed.", color:C.green },
-  { n:5, label:"Done / Loop", icon:"🔄", detail:"If the goal is met, the agent reports back. If not, it loops again — re-planning with the new information from the last action.", color:C.accent },
-];
+  <script>
+    function switchTab(i) {
+      document.querySelectorAll('.tab').forEach((t, j) => {
+        t.classList.toggle('active', i === j);
+      });
+      document.querySelectorAll('.section').forEach((s, j) => {
+        s.classList.toggle('active', i === j);
+      });
+    }
 
-const TOOLS = [
-  { id:"web", label:"Web Search", color:C.blue, desc:"Browse live web pages, search for current information, read articles and documentation.", uses:["Research tasks","Fact checking","Finding current data"] },
-  { id:"code", label:"Code Execution", color:C.purple, desc:"Write and run code in sandboxed environments — Python, JavaScript, shell scripts.", uses:["Data analysis","File processing","Calculations","Automations"] },
-  { id:"files", label:"File System", color:C.amber, desc:"Read, write, move, and organise files — PDFs, spreadsheets, images, documents.", uses:["Document processing","Report generation","Data extraction"] },
-  { id:"api", label:"External APIs", color:C.green, desc:"Connect to any service with an API — Slack, email, calendar, databases, payment systems.", uses:["Sending messages","Scheduling","CRM updates","Orders"] },
-  { id:"memory", label:"Memory / RAG", color:C.accent, desc:"Retrieve relevant information from a knowledge base or past conversations to inform the current task.", uses:["Personalisation","Long-term context","Knowledge retrieval"] },
-];
+    function switchSubtab(event, i) {
+      const container = event.target.parentElement;
+      container.querySelectorAll('.subtab').forEach((t, j) => {
+        t.classList.toggle('active', i === j);
+      });
+      container.parentElement.querySelectorAll('.subtab-content').forEach((s, j) => {
+        s.classList.toggle('active', i === j);
+      });
+    }
 
-const EXAMPLES = [
-  { title:"Market research report", color:C.blue, steps:["Search web for competitor pricing pages","Read and extract pricing tiers from each site","Run code to generate comparison table","Write summary report and export as PDF"], time:"~3 min", saving:"~2 hrs manual" },
-  { title:"Inbox triage & reply drafts", color:C.purple, steps:["Read unread emails from last 24h","Classify each by urgency and topic","Draft reply for each action-needed email","Add flagged items to task list"], time:"~1 min", saving:"~30 min manual" },
-  { title:"Data pipeline & dashboard", color:C.amber, steps:["Pull data from database API","Clean and normalise with Python","Generate charts and summary stats","Update dashboard via API and notify team"], time:"~2 min", saving:"~1 hr manual" },
-];
-
-const CHATBOT_VS = [
-  { dim:"Scope", chatbot:"Answers one question at a time", agent:"Completes multi-step tasks end-to-end" },
-  { dim:"Action", chatbot:"Generates text only", agent:"Executes real actions in the world" },
-  { dim:"Memory", chatbot:"Forgets between turns (often)", agent:"Maintains state across all steps" },
-  { dim:"Tools", chatbot:"No external access", agent:"Uses web, code, files, APIs" },
-  { dim:"Loop", chatbot:"One response per prompt", agent:"Loops until the goal is achieved" },
-  { dim:"Effort", chatbot:"You do the follow-up work", agent:"Handles the follow-up autonomously" },
-];
-
-function SectionConcept() {
-  return (
-    <div style={{display:"flex",flexDirection:"column",gap:16}}>
-      <Card accent={C.accent}>
-        <div style={{paddingTop:8}}>
-          <Tag color={C.accent}>DEFINITION</Tag>
-          <P style={{marginTop:12,fontSize:15,color:C.text,fontWeight:500,lineHeight:1.7}}>
-            An AI agent is an AI that can take actions in the world — not just generate text. It perceives its environment, makes decisions, uses tools, and loops until a goal is accomplished.
-          </P>
-        </div>
-      </Card>
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16}}>
-        <Card>
-          <H3 color={C.blue}>The Analogy</H3>
-          <P>A chatbot is like asking someone a question. An AI agent is like hiring an assistant who goes off, does the work — researching, writing, sending — and returns with the finished result.</P>
-        </Card>
-        <Card>
-          <H3 color={C.purple}>The Key Shift</H3>
-          <P>Traditional software follows fixed rules. An agent reasons about what to do next, adapts when things change, and uses judgment — not just instructions — to reach its goal.</P>
-        </Card>
-      </div>
-      <Card style={{background:`${C.purple}06`,border:`1px solid ${C.purple}20`}}>
-        <Tag color={C.purple}>KEY INSIGHT</Tag>
-        <P style={{marginTop:8}}>The agent loop — perceive, plan, act, observe — is the defining pattern. Everything else (tools, memory, multi-agent systems) is built on top of this core loop.</P>
-      </Card>
-    </div>
-  );
-}
-
-function SectionLoop() {
-  const [active, setActive] = useState(null);
-  return (
-    <div style={{display:"flex",flexDirection:"column",gap:12}}>
-      <P style={{marginBottom:4}}>Click any step in the loop to see what's actually happening.</P>
-      {LOOP_STEPS.map((s,i) => (
-        <div key={i}>
-          <Card onClick={() => setActive(active===i?null:i)}
-            accent={active===i?s.color:undefined}
-            style={{border:active===i?`2px solid ${s.color}`:`1px solid ${C.border}`,padding:active===i?"16px 19px":20,transition:"all 0.2s"}}>
-            <div style={{display:"flex",gap:14,alignItems:"center"}}>
-              <div style={{width:38,height:38,borderRadius:4,background:s.color,display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,flexShrink:0}}>{s.icon}</div>
-              <div style={{flex:1}}>
-                <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:4}}>
-                  <span style={{fontFamily:font.mono,fontSize:10,color:s.color,textTransform:"uppercase",letterSpacing:1}}>Step {s.n}</span>
-                  <H3 color={active===i?s.color:C.text}>{s.label}</H3>
-                </div>
-                <P style={{fontSize:12.5}}>{s.detail}</P>
-              </div>
-              <span style={{fontFamily:font.mono,fontSize:11,color:C.muted}}>{active===i?"▲":"▼"}</span>
-            </div>
-            {active===i && (
-              <div style={{marginTop:12,padding:12,background:`${s.color}05`,border:`1px solid ${s.color}15`,borderRadius:4}}>
-                <P style={{fontSize:12.5,color:s.color,fontWeight:500}}>
-                  {i===0 && "Context accumulates with each loop. By step 3, the agent has a rich model of what's been tried, what worked, and what's still needed."}
-                  {i===1 && "Planning quality determines everything. A good agent knows when to ask for clarification, when to simplify a task, and when a sub-agent would be faster."}
-                  {i===2 && "The action is real and consequential — a file gets written, an email gets sent, code gets executed. This is what distinguishes agents from chatbots."}
-                  {i===3 && "Observing isn't just reading output. A skilled agent catches unexpected results, adapts its plan, and decides whether to retry or escalate."}
-                  {i===4 && "Most real tasks take 3–10 loops. Simple tasks (look something up) take 1. Complex tasks (build a report) can take 20+."}
-                </P>
-              </div>
-            )}
-          </Card>
-          {i < LOOP_STEPS.length-1 && (
-            <div style={{textAlign:"center",padding:"4px 0",color:C.muted,fontSize:16}}>↓</div>
-          )}
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function SectionTools() {
-  const [active, setActive] = useState(0);
-  const tool = TOOLS[active];
-  return (
-    <div style={{display:"flex",flexDirection:"column",gap:16}}>
-      <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
-        {TOOLS.map((t,i) => (
-          <button key={i} onClick={() => setActive(i)} style={{
-            fontFamily:font.heading,fontSize:12,fontWeight:active===i?700:500,
-            color:active===i?t.color:C.sub,background:active===i?`${t.color}08`:"transparent",
-            border:`1px solid ${active===i?`${t.color}30`:"transparent"}`,
-            borderRadius:4,padding:"8px 14px",cursor:"pointer",transition:"all 0.2s"}}>{t.label}</button>
-        ))}
-      </div>
-      <Card accent={tool.color} style={{border:`2px solid ${tool.color}30`}}>
-        <div style={{paddingTop:8}}>
-          <Tag color={tool.color}>{tool.label.toUpperCase()}</Tag>
-          <P style={{marginTop:10,marginBottom:16}}>{tool.desc}</P>
-          <div style={{fontFamily:font.mono,fontSize:10,color:C.muted,textTransform:"uppercase",letterSpacing:1,marginBottom:10}}>COMMON USES</div>
-          <div style={{display:"flex",flexWrap:"wrap",gap:8}}>
-            {tool.uses.map((u,i) => <Tag key={i} color={tool.color}>{u}</Tag>)}
-          </div>
-        </div>
-      </Card>
-      <Card style={{background:`${C.blue}06`,border:`1px solid ${C.blue}20`}}>
-        <Tag color={C.blue}>HOW TOOLS WORK</Tag>
-        <P style={{marginTop:8}}>The AI doesn't run tools directly — it generates structured calls (function name + parameters). A surrounding system executes those calls and returns results back into the agent's context.</P>
-      </Card>
-    </div>
-  );
-}
-
-function SectionVsChatbot() {
-  return (
-    <div style={{display:"flex",flexDirection:"column",gap:16}}>
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16}}>
-        <Card>
-          <H3 color={C.red}>Chatbot</H3>
-          {CHATBOT_VS.map((v,i) => (
-            <div key={i} style={{display:"flex",gap:10,alignItems:"flex-start",padding:"8px 0",borderBottom:i<CHATBOT_VS.length-1?`1px solid ${C.border}`:"none"}}>
-              <span style={{fontFamily:font.mono,fontSize:11,color:C.red,flexShrink:0,marginTop:1}}>✗</span>
-              <div>
-                <div style={{fontFamily:font.mono,fontSize:10,color:C.muted,textTransform:"uppercase",letterSpacing:1,marginBottom:2}}>{v.dim}</div>
-                <P style={{fontSize:12}}>{v.chatbot}</P>
-              </div>
-            </div>
-          ))}
-        </Card>
-        <Card accent={C.green}>
-          <div style={{paddingTop:8}}>
-          <H3 color={C.green}>Agent</H3>
-          {CHATBOT_VS.map((v,i) => (
-            <div key={i} style={{display:"flex",gap:10,alignItems:"flex-start",padding:"8px 0",borderBottom:i<CHATBOT_VS.length-1?`1px solid ${C.border}`:"none"}}>
-              <span style={{fontFamily:font.mono,fontSize:11,color:C.green,flexShrink:0,marginTop:1}}>✓</span>
-              <div>
-                <div style={{fontFamily:font.mono,fontSize:10,color:C.muted,textTransform:"uppercase",letterSpacing:1,marginBottom:2}}>{v.dim}</div>
-                <P style={{fontSize:12}}>{v.agent}</P>
-              </div>
-            </div>
-          ))}
-          </div>
-        </Card>
-      </div>
-    </div>
-  );
-}
-
-function SectionExamples() {
-  const [active, setActive] = useState(0);
-  const ex = EXAMPLES[active];
-  return (
-    <div style={{display:"flex",flexDirection:"column",gap:16}}>
-      <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
-        {EXAMPLES.map((e,i) => (
-          <button key={i} onClick={() => setActive(i)} style={{
-            fontFamily:font.heading,fontSize:12,fontWeight:active===i?700:500,
-            color:active===i?e.color:C.sub,background:active===i?`${e.color}08`:"transparent",
-            border:`1px solid ${active===i?`${e.color}30`:"transparent"}`,
-            borderRadius:4,padding:"8px 14px",cursor:"pointer",transition:"all 0.2s"}}>{e.title}</button>
-        ))}
-      </div>
-      <Card accent={ex.color} style={{border:`2px solid ${ex.color}30`}}>
-        <div style={{paddingTop:8}}>
-          <Tag color={ex.color}>WALKTHROUGH</Tag>
-          <H3 style={{marginTop:10}} color={ex.color}>{ex.title}</H3>
-          {ex.steps.map((s,i) => (
-            <div key={i} style={{display:"flex",gap:12,alignItems:"flex-start",padding:"10px 0",borderBottom:i<ex.steps.length-1?`1px solid ${C.border}`:"none"}}>
-              <div style={{width:22,height:22,borderRadius:4,background:`${ex.color}15`,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:font.mono,fontSize:11,color:ex.color,fontWeight:600,flexShrink:0}}>{i+1}</div>
-              <P style={{fontSize:13}}>{s}</P>
-            </div>
-          ))}
-          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginTop:16}}>
-            <div style={{padding:12,background:`${ex.color}05`,border:`1px solid ${ex.color}15`,borderRadius:4}}>
-              <div style={{fontFamily:font.mono,fontSize:10,color:ex.color,textTransform:"uppercase",letterSpacing:1,marginBottom:4}}>Agent time</div>
-              <P style={{fontSize:13,fontWeight:600,color:ex.color}}>{ex.time}</P>
-            </div>
-            <div style={{padding:12,background:`${C.green}05`,border:`1px solid ${C.green}15`,borderRadius:4}}>
-              <div style={{fontFamily:font.mono,fontSize:10,color:C.green,textTransform:"uppercase",letterSpacing:1,marginBottom:4}}>Manual equivalent</div>
-              <P style={{fontSize:13,fontWeight:600,color:C.green}}>{ex.saving}</P>
-            </div>
-          </div>
-        </div>
-      </Card>
-    </div>
-  );
-}
-
-export default function AgentsExplainer() {
-  const [tab, setTab] = useState(0);
-  const TABS = ["The Concept","Agent Loop","Tool Types","vs Chatbot","Real Examples"];
-  const sections = [<SectionConcept/>,<SectionLoop/>,<SectionTools/>,<SectionVsChatbot/>,<SectionExamples/>];
-  return (
-    <div style={{background:C.bg,minHeight:"100vh",fontFamily:font.body,color:C.text}}>
-      <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
-      <div style={{padding:"32px 24px 0",maxWidth:800,margin:"0 auto"}}>
-        <span style={{fontFamily:font.mono,fontSize:11,color:C.accent,background:`${C.accent}10`,padding:"2px 10px",borderRadius:3,letterSpacing:2,textTransform:"uppercase"}}>Visual Explainer</span>
-        <h1 style={{fontFamily:font.heading,fontSize:30,fontWeight:700,color:C.text,margin:"8px 0 4px",lineHeight:1.2,letterSpacing:-0.5}}>What are AI Agents?</h1>
-        <P>AI that doesn't just answer — it acts. The loop, the tools, and why agents are a fundamentally different kind of system.</P>
-      </div>
-      <div style={{maxWidth:800,margin:"20px auto 0",padding:"0 24px",display:"flex",gap:4,flexWrap:"wrap"}}>
-        {TABS.map((t,i) => (
-          <button key={i} onClick={() => setTab(i)} style={{fontFamily:font.heading,fontSize:12,fontWeight:tab===i?700:500,color:tab===i?C.accent:C.sub,background:tab===i?`${C.accent}08`:"transparent",border:`1px solid ${tab===i?`${C.accent}30`:"transparent"}`,borderRadius:4,padding:"8px 14px",cursor:"pointer",transition:"all 0.2s"}}>{t}</button>
-        ))}
-      </div>
-      <div style={{maxWidth:800,margin:"16px auto 40px",padding:"0 24px"}}>{sections[tab]}</div>
-      <div style={{maxWidth:800,margin:"0 auto",padding:"16px 24px 32px",borderTop:`1px solid ${C.border}`}}>
-        <P style={{fontSize:11,color:C.muted,textAlign:"center"}}>
-          <a href="claude.html" style={{color:C.accent,textDecoration:"none"}}>← Claude</a> · <a href="index.html" style={{color:C.accent,textDecoration:"none"}}>AI Concepts Series</a> · <a href="claude-cowork.html" style={{color:C.accent,textDecoration:"none"}}>Claude Cowork →</a>
-        </P>
-      </div>
-    </div>
-  );
-}
-ReactDOM.createRoot(document.getElementById('root')).render(<AgentsExplainer/>);
-</script></body></html>
+    document.querySelectorAll('.expand-card').forEach(card => {
+      card.addEventListener('click', function() {
+        this.classList.toggle('expanded');
+      });
+    });
+  </script>
+</body>
+</html>

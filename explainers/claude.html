@@ -1,316 +1,532 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>What is Claude? — Visual Explainer</title>
-<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-<style>*{box-sizing:border-box;margin:0;padding:0}body{background:#f8f8f6}</style>
-</head><body><div id="root"></div>
-<script type="text/babel">
-const { useState } = React;
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>What is Claude?</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background: #f8f8f6;
+      font-family: 'IBM Plex Sans', sans-serif;
+      color: #333;
+      padding: 40px 20px;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 30px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin-bottom: 12px;
+    }
+    .subtitle {
+      font-size: 15px;
+      color: #666;
+      margin-bottom: 32px;
+      line-height: 1.6;
+    }
+    .tabs {
+      display: flex;
+      gap: 0;
+      margin-bottom: 32px;
+      border-bottom: 1px solid #e5e5e0;
+      overflow-x: auto;
+    }
+    .tab {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 12px 16px;
+      cursor: pointer;
+      color: #666;
+      border: none;
+      background: none;
+      border-bottom: 2px solid transparent;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+    }
+    .tab:hover { color: #333; }
+    .tab.active {
+      color: #ea580c;
+      background: #ea580c08;
+      border-bottom: 2px solid #ea580c;
+    }
+    .sections { position: relative; }
+    .section { display: none; }
+    .section.active { display: block; }
+    .card {
+      background: white;
+      border: 1px solid #e5e5e0;
+      border-radius: 4px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+      padding: 24px;
+      margin-bottom: 20px;
+      position: relative;
+      padding-top: 28px;
+    }
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 3px;
+      width: 100%;
+      border-radius: 4px 4px 0 0;
+    }
+    .card.blue::before { background: #0891b2; }
+    .card.purple::before { background: #7c3aed; }
+    .card.green::before { background: #16a34a; }
+    .card.orange::before { background: #ea580c; }
+    .card.amber::before { background: #ca8a04; }
+    .card h3 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+    .card p {
+      font-size: 14px;
+      line-height: 1.6;
+      color: #555;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    @media (max-width: 600px) {
+      .grid-2 { grid-template-columns: 1fr; }
+    }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    @media (max-width: 600px) {
+      .grid-3 { grid-template-columns: 1fr; }
+    }
+    .expand-card {
+      background: white;
+      border: 1px solid #e5e5e0;
+      border-radius: 4px;
+      padding: 20px;
+      margin-bottom: 16px;
+      cursor: pointer;
+      position: relative;
+      padding-left: 28px;
+      transition: box-shadow 0.2s ease;
+    }
+    .expand-card:hover { box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
+    .expand-card::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      border-radius: 4px 0 0 4px;
+    }
+    .expand-card.blue::before { background: #0891b2; }
+    .expand-card.purple::before { background: #7c3aed; }
+    .expand-card.green::before { background: #16a34a; }
+    .expand-card.orange::before { background: #ea580c; }
+    .expand-card.amber::before { background: #ca8a04; }
+    .expand-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .expand-content {
+      font-size: 13px;
+      line-height: 1.5;
+      color: #666;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+    }
+    .expand-card.expanded .expand-content { max-height: 300px; }
+    .expand-icon {
+      font-size: 12px;
+      float: right;
+      transition: transform 0.3s ease;
+    }
+    .expand-card.expanded .expand-icon { transform: rotate(180deg); }
+    .subtabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .subtab {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 8px 12px;
+      background: white;
+      border: 1px solid #e5e5e0;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .subtab:hover { border-color: #d0d0cb; }
+    .subtab.active { background: #ea580c; color: white; border-color: #ea580c; }
+    .subtab.blue.active { background: #0891b2; border-color: #0891b2; }
+    .subtab.purple.active { background: #7c3aed; border-color: #7c3aed; }
+    .subtab.green.active { background: #16a34a; border-color: #16a34a; }
+    .subtab.amber.active { background: #ca8a04; border-color: #ca8a04; }
+    .subtab-content { display: none; }
+    .subtab-content.active { display: block; }
+    .tag {
+      display: inline-block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 2px;
+      background: #f0f0ee;
+      color: #666;
+      margin-right: 6px;
+      margin-top: 8px;
+      text-transform: uppercase;
+    }
+    .comparison-row {
+      padding: 16px;
+      border-bottom: 1px solid #e5e5e0;
+      display: grid;
+      grid-template-columns: 140px 1fr 1fr;
+      gap: 16px;
+      align-items: start;
+    }
+    .comparison-row:last-child { border-bottom: none; }
+    .comparison-aspect {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      color: #999;
+      text-transform: uppercase;
+      padding-top: 2px;
+    }
+    .comparison-label {
+      font-size: 11px;
+      color: #bbb;
+      font-family: 'JetBrains Mono', monospace;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .comparison-value {
+      font-size: 13px;
+      line-height: 1.5;
+      color: #555;
+    }
+    .footer {
+      margin-top: 48px;
+      padding-top: 24px;
+      border-top: 1px solid #e5e5e0;
+      font-size: 13px;
+      color: #999;
+      text-align: center;
+    }
+    .footer a { color: #0891b2; text-decoration: none; }
+    .footer a:hover { text-decoration: underline; }
+    .mark { font-size: 16px; margin-right: 8px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>What is Claude?</h1>
+    <p class="subtitle">An AI assistant built by Anthropic to be helpful, harmless, and honest. Not just a text predictor — a reasoner trained to think carefully and be genuinely useful.</p>
 
-const C = {
-  bg:"#f8f8f6", card:"#fff", border:"#e5e5e0",
-  text:"#222", sub:"#666", muted:"#999",
-  accent:"#ea580c", blue:"#0891b2", purple:"#7c3aed",
-  green:"#16a34a", amber:"#ca8a04", red:"#dc2626",
-};
-const font = {
-  heading:"'Space Grotesk', sans-serif",
-  body:"'IBM Plex Sans', sans-serif",
-  mono:"'JetBrains Mono', monospace",
-};
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab(0)">What It Is</button>
+      <button class="tab" onclick="switchTab(1)">How It Thinks</button>
+      <button class="tab" onclick="switchTab(2)">Capabilities</button>
+      <button class="tab" onclick="switchTab(3)">vs Other AI</button>
+      <button class="tab" onclick="switchTab(4)">Get Started</button>
+    </div>
 
-const Card = ({ children, style, accent, onClick }) => (
-  <div onClick={onClick} style={{
-    background:C.card, border:`1px solid ${C.border}`, borderRadius:4,
-    padding:20, position:"relative", overflow:"hidden",
-    boxShadow:"0 1px 3px rgba(0,0,0,0.04)",
-    cursor:onClick?"pointer":"default", ...style
-  }}>
-    {accent && <div style={{position:"absolute",top:0,left:0,right:0,height:3,background:accent}}/>}
-    {children}
+    <div class="sections">
+
+      <!-- Tab 0: What It Is -->
+      <div class="section active">
+        <div class="card orange">
+          <p><strong>Claude is a large language model (LLM) made by Anthropic. It reads your input, reasons about what a helpful, honest response looks like, and generates it — drawing on broad training and careful alignment work.</strong></p>
+        </div>
+
+        <div class="grid-2">
+          <div class="card blue">
+            <h3>The Short Version</h3>
+            <p>Claude is trained on vast amounts of text and fine-tuned using human feedback to be helpful, accurate, and safe. It can write, reason, code, analyze, and converse across nearly any topic.</p>
+          </div>
+          <div class="card purple">
+            <h3>Who Made It</h3>
+            <p>Anthropic — an AI safety company founded in 2021. Their focus is building AI that is reliable, interpretable, and aligned with human intentions, not just capable.</p>
+          </div>
+        </div>
+
+        <div class="card green">
+          <h3>What Makes It Different</h3>
+          <p>Claude is trained with a strong emphasis on <strong>constitutional AI</strong> — a set of principles guiding how it reasons about what's helpful vs. harmful. It's designed to push back on bad requests, admit uncertainty, and avoid overconfidence.</p>
+        </div>
+
+        <div class="grid-3">
+          <div class="card blue">
+            <p style="font-size: 13px;"><span class="mark">🧠</span><strong>Reasoning</strong><br><span style="color:#666;">Works through complex problems step by step</span></p>
+          </div>
+          <div class="card purple">
+            <p style="font-size: 13px;"><span class="mark">🛡️</span><strong>Safety-first</strong><br><span style="color:#666;">Declines harmful requests, not just risky ones</span></p>
+          </div>
+          <div class="card amber">
+            <p style="font-size: 13px;"><span class="mark">📖</span><strong>Honest</strong><br><span style="color:#666;">Tells you when it doesn't know something</span></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 1: How It Thinks -->
+      <div class="section">
+        <div class="card blue">
+          <h3>Not Lookup — Reasoning</h3>
+          <p>Claude doesn't retrieve pre-written answers. It generates a response token by token, reasoning through the problem as it goes. For harder questions, it can think step-by-step in an extended thinking mode before answering.</p>
+        </div>
+
+        <div class="expand-card blue">
+          <span class="expand-icon">▼</span>
+          <div class="expand-title">Context Window</div>
+          <div class="expand-content">Claude processes everything in a "context window" — your messages, previous turns, uploaded files, instructions. It attends to all of this simultaneously rather than linearly. Longer contexts let Claude handle complex tasks without losing track, but very long contexts can reduce focus on specific details.</div>
+        </div>
+
+        <div class="expand-card purple">
+          <span class="expand-icon">▼</span>
+          <div class="expand-title">Chain-of-Thought</div>
+          <div class="expand-content">For complex problems, Claude reasons step by step — breaking the problem into parts, working through each, then synthesizing an answer. This dramatically improves accuracy on math, logic, and multi-step tasks. You can prompt Claude to "think step by step" to make this explicit.</div>
+        </div>
+
+        <div class="expand-card amber">
+          <span class="expand-icon">▼</span>
+          <div class="expand-title">Uncertainty & Calibration</div>
+          <div class="expand-content">Claude is trained to be calibrated — confident when it has good reason, uncertain when it doesn't. It will say "I'm not sure" or "you should verify this" when appropriate. Overconfident AI is more dangerous than cautious AI, so this is intentional.</div>
+        </div>
+
+        <div class="expand-card green">
+          <span class="expand-icon">▼</span>
+          <div class="expand-title">No Memory Between Sessions</div>
+          <div class="expand-content">By default, Claude starts fresh each conversation. It has no memory of past sessions unless the application explicitly passes that context in. Within a session, it remembers everything said so far. This is a privacy feature — your conversations aren't used to train the model.</div>
+        </div>
+
+        <div class="expand-card orange">
+          <span class="expand-icon">▼</span>
+          <div class="expand-title">Knowledge Cutoff</div>
+          <div class="expand-content">Claude's training data has a cutoff date — it doesn't know about events after that point unless given tools like web search. It can tell you its cutoff date if asked. For current events, Claude can use search tools when available, or acknowledge that its information may be outdated.</div>
+        </div>
+      </div>
+
+      <!-- Tab 2: Capabilities -->
+      <div class="section">
+        <div class="subtabs">
+          <button class="subtab blue active" onclick="switchSubtab(event, 0)">Writing</button>
+          <button class="subtab purple" onclick="switchSubtab(event, 1)">Coding</button>
+          <button class="subtab amber" onclick="switchSubtab(event, 2)">Analysis</button>
+          <button class="subtab green" onclick="switchSubtab(event, 3)">Research</button>
+          <button class="subtab orange" onclick="switchSubtab(event, 4)">Conversation</button>
+        </div>
+
+        <div class="subtab-content active">
+          <div class="card blue">
+            <h3>Writing</h3>
+            <p><strong>Essays, emails, reports, stories, documentation, scripts, marketing copy, and more.</strong></p>
+            <p style="margin-top: 12px;">Claude adapts tone and style for the audience — formal reports, casual emails, creative fiction. It can edit your writing, rewrite for clarity, or generate from a brief.</p>
+            <div>
+              <span class="tag">Drafting</span>
+              <span class="tag">Editing</span>
+              <span class="tag">Summarizing</span>
+              <span class="tag">Tone Matching</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="subtab-content">
+          <div class="card purple">
+            <h3>Coding</h3>
+            <p><strong>Write, explain, debug, and refactor code in virtually any language.</strong></p>
+            <p style="margin-top: 12px;">Claude understands code structure and can walk through logic, catch bugs, write tests, and explain unfamiliar codebases. It works in Python, JavaScript, TypeScript, Rust, Go, SQL, and dozens more.</p>
+            <div>
+              <span class="tag">Python</span>
+              <span class="tag">JavaScript</span>
+              <span class="tag">Debugging</span>
+              <span class="tag">Code Review</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="subtab-content">
+          <div class="card amber">
+            <h3>Analysis</h3>
+            <p><strong>Break down complex topics, find patterns, compare options, and evaluate arguments.</strong></p>
+            <p style="margin-top: 12px;">Claude excels at structured reasoning — pros/cons analysis, data interpretation, logical evaluation, summarization. It can work through a spreadsheet, evaluate a business plan, or audit an argument for logical flaws.</p>
+            <div>
+              <span class="tag">Data Analysis</span>
+              <span class="tag">Logic</span>
+              <span class="tag">Comparison</span>
+              <span class="tag">Evaluation</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="subtab-content">
+          <div class="card green">
+            <h3>Research</h3>
+            <p><strong>Synthesize knowledge, explain concepts, and explore topics in depth.</strong></p>
+            <p style="margin-top: 12px;">Claude can serve as a research partner — explaining technical topics accessibly, connecting ideas across domains, and generating thorough summaries. When given web search tools, it can pull in current information.</p>
+            <div>
+              <span class="tag">Synthesis</span>
+              <span class="tag">Explanation</span>
+              <span class="tag">Deep Dives</span>
+              <span class="tag">Fact Checking</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="subtab-content">
+          <div class="card orange">
+            <h3>Conversation</h3>
+            <p><strong>Think through problems, explore ideas, get feedback, or just talk.</strong></p>
+            <p style="margin-top: 12px;">Claude is designed to be a good thinking partner — it pushes back thoughtfully, offers perspectives, and asks good questions. Useful for brainstorming, processing decisions, or working through complex topics.</p>
+            <div>
+              <span class="tag">Brainstorming</span>
+              <span class="tag">Feedback</span>
+              <span class="tag">Debate</span>
+              <span class="tag">Planning</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 3: vs Other AI -->
+      <div class="section">
+        <div class="card purple">
+          <h3>The Landscape</h3>
+          <p>Several major AI assistants exist — Claude, ChatGPT (OpenAI), Gemini (Google), Copilot (Microsoft). They're all LLM-based, broadly capable, and improving rapidly. The differences lie in philosophy, training approach, and specific strengths.</p>
+        </div>
+
+        <div class="card blue" style="padding: 0; padding-top: 3px; overflow: hidden;">
+          <div class="comparison-row" style="background: #fafaf9;">
+            <div class="comparison-aspect">Aspect</div>
+            <div><div class="comparison-label">Claude</div></div>
+            <div><div class="comparison-label">Others (GPT-4, Gemini)</div></div>
+          </div>
+          <div class="comparison-row">
+            <div class="comparison-aspect">Philosophy</div>
+            <div><div class="comparison-value">Safety-first. Constitutional AI principles. Calibrated uncertainty.</div></div>
+            <div><div class="comparison-value">Capability-first with safety layers added on top.</div></div>
+          </div>
+          <div class="comparison-row">
+            <div class="comparison-aspect">Long Context</div>
+            <div><div class="comparison-value">Strong on 100k+ token contexts. Careful on detail retention.</div></div>
+            <div><div class="comparison-value">Variable — GPT-4 and Gemini both handle long context well.</div></div>
+          </div>
+          <div class="comparison-row">
+            <div class="comparison-aspect">Honesty</div>
+            <div><div class="comparison-value">Will say "I don't know." Pushes back on bad premises. Calibrated.</div></div>
+            <div><div class="comparison-value">Varies — some models more prone to confident hallucinations.</div></div>
+          </div>
+          <div class="comparison-row">
+            <div class="comparison-aspect">Coding</div>
+            <div><div class="comparison-value">Strong, especially for understanding and explanation.</div></div>
+            <div><div class="comparison-value">GPT-4 is highly competitive. Copilot leads for in-editor flow.</div></div>
+          </div>
+          <div class="comparison-row">
+            <div class="comparison-aspect">Integrations</div>
+            <div><div class="comparison-value">API, Claude.ai, Cowork, Claude Code. Growing ecosystem.</div></div>
+            <div><div class="comparison-value">ChatGPT has broader GPTs ecosystem; Gemini in Google Workspace.</div></div>
+          </div>
+        </div>
+
+        <div class="card amber">
+          <p><strong>Bottom line:</strong> All frontier models are highly capable. Claude tends to stand out for careful reasoning, honesty about limitations, and strong performance on nuanced writing tasks. The best model is usually the one that fits your workflow.</p>
+        </div>
+      </div>
+
+      <!-- Tab 4: Get Started -->
+      <div class="section">
+        <div class="card green">
+          <h3>Tips for Getting the Best Results</h3>
+          <p>Claude responds well to clear context. The more you tell it about what you need, why, and for whom — the better the output.</p>
+        </div>
+
+        <div class="expand-card blue">
+          <span class="expand-icon">▼</span>
+          <div class="expand-title">Be Specific About What You Want</div>
+          <div class="expand-content">Instead of "write an email", try "write a professional email to a client explaining a project delay, keeping it under 150 words, apologetic but confident." The more constraints you give, the less Claude has to guess — and the better the result.</div>
+        </div>
+
+        <div class="expand-card purple">
+          <span class="expand-icon">▼</span>
+          <div class="expand-title">Give Context and Audience</div>
+          <div class="expand-content">Claude adapts its style dramatically based on audience. "Explain quantum entanglement to a 10-year-old" vs "to a physics PhD" produces completely different responses. Always state who this is for — it matters more than most people think.</div>
+        </div>
+
+        <div class="expand-card amber">
+          <span class="expand-icon">▼</span>
+          <div class="expand-title">Ask It to Think Step by Step</div>
+          <div class="expand-content">For complex reasoning tasks, add "think step by step" or "show your reasoning." This activates more deliberate reasoning and dramatically improves accuracy on math, logic puzzles, multi-step planning, and code debugging.</div>
+        </div>
+
+        <div class="expand-card green">
+          <span class="expand-icon">▼</span>
+          <div class="expand-title">Iterate, Don't Restart</div>
+          <div class="expand-content">You don't need a perfect prompt on the first try. Start with a draft, get Claude's output, then refine: "make it shorter", "make the tone less formal", "add a section on X." Treating it as a conversation rather than a one-shot query usually gets better results.</div>
+        </div>
+
+        <div class="expand-card orange">
+          <span class="expand-icon">▼</span>
+          <div class="expand-title">Push Back and Ask Why</div>
+          <div class="expand-content">Claude's first answer isn't always its best. Ask it to reconsider, challenge its reasoning, or try a different approach. It's designed to be a thinking partner — and it will genuinely update when you give it good reasons to.</div>
+        </div>
+
+        <div class="card blue" style="margin-top: 8px;">
+          <h3>Where to Use Claude</h3>
+          <p style="margin-bottom: 12px;"><strong>Claude.ai</strong> — The main web and mobile interface. Best for conversations, documents, and everyday tasks.</p>
+          <p style="margin-bottom: 12px;"><strong>Claude API</strong> — For developers building applications on top of Claude.</p>
+          <p style="margin-bottom: 12px;"><strong>Claude Code</strong> — Terminal-based tool for agentic coding tasks.</p>
+          <p><strong>Cowork</strong> — Desktop tool for file management, automation, and non-developer workflows.</p>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="footer">
+      <a href="index.html">← Back to all explainers</a> &nbsp;·&nbsp; Built with the visual-explainer design system
+    </div>
   </div>
-);
-const Tag = ({ color, children }) => (
-  <span style={{fontFamily:font.mono,fontSize:11,color,background:`${color}12`,
-    border:`1px solid ${color}30`,padding:"2px 10px",borderRadius:3,
-    letterSpacing:0.5,display:"inline-block"}}>{children}</span>
-);
-const H2 = ({ children }) => (
-  <h2 style={{fontFamily:font.heading,fontSize:22,fontWeight:700,color:C.text,margin:"0 0 6px"}}>{children}</h2>
-);
-const H3 = ({ children, color }) => (
-  <h3 style={{fontFamily:font.heading,fontSize:16,fontWeight:700,color:color||C.text,margin:"0 0 8px"}}>{children}</h3>
-);
-const P = ({ children, style }) => (
-  <p style={{fontFamily:font.body,fontSize:13.5,color:C.sub,lineHeight:1.65,margin:0,...style}}>{children}</p>
-);
 
-// ── DATA ──────────────────────────────────────────────────────────────────────
+  <script>
+    function switchTab(i) {
+      document.querySelectorAll('.tab').forEach((t, j) => t.classList.toggle('active', i === j));
+      document.querySelectorAll('.section').forEach((s, j) => s.classList.toggle('active', i === j));
+    }
 
-const CAPABILITIES = [
-  { id:"write", label:"Writing & Editing", color:C.blue,
-    short:"Drafts, edits, rephrases, summarises — in any style or tone.",
-    detail:"From emails to essays to legal briefs. Claude adapts voice, length, and formality to your audience.",
-    examples:["Write a job posting", "Fix the tone of this email", "Summarise this 20-page doc in 3 bullets"] },
-  { id:"code", label:"Coding", color:C.purple,
-    short:"Writes, reviews, debugs and explains code across all major languages.",
-    detail:"Claude understands context across files, explains what code does in plain language, and catches subtle bugs.",
-    examples:["Build a React component", "Why is this Python throwing a TypeError?", "Convert this SQL to Python pandas"] },
-  { id:"reason", label:"Analysis & Reasoning", color:C.amber,
-    short:"Breaks down complex problems, compares options, identifies trade-offs.",
-    detail:"Give Claude a messy problem and it maps out the variables, weighs options, and explains the reasoning step by step.",
-    examples:["Pros and cons of these two strategies", "What are the risks in this contract?", "Help me think through this decision"] },
-  { id:"research", label:"Research", color:C.green,
-    short:"Synthesises knowledge, explains concepts, answers with nuance.",
-    detail:"Claude draws on broad training to explain ideas clearly — science, history, business, law — and flags where it's uncertain.",
-    examples:["Explain transformer architecture simply", "What happened in the 2008 financial crisis?", "How does this medication work?"] },
-  { id:"chat", label:"Conversation", color:C.accent,
-    short:"Thinks out loud with you — brainstorming, coaching, sounding board.",
-    detail:"Sometimes you don't need an answer, you need to think. Claude is a thinking partner that asks good questions.",
-    examples:["Help me structure my thoughts", "Play devil's advocate on this idea", "What am I missing in this plan?"] },
-];
+    function switchSubtab(event, i) {
+      const container = event.target.parentElement;
+      container.querySelectorAll('.subtab').forEach((t, j) => t.classList.toggle('active', i === j));
+      container.parentElement.querySelectorAll('.subtab-content').forEach((s, j) => s.classList.toggle('active', i === j));
+    }
 
-const VS_ITEMS = [
-  { label:"Memory", claude:"Holds your full conversation in context", other:"Often resets between messages" },
-  { label:"Safety", claude:"Trained to be honest and decline harmful requests", other:"Varies widely" },
-  { label:"Nuance", claude:"Understands tone, subtext, and ambiguity", other:"Often literal and rigid" },
-  { label:"Honesty", claude:"Says 'I don't know' rather than hallucinating", other:"May confidently make things up" },
-  { label:"Length", claude:"Can handle very long documents and threads", other:"Often has short context windows" },
-];
-
-const HOW_STEPS = [
-  { n:1, title:"You write a message", detail:"Anything — a question, a task, a half-formed idea. Claude reads the entire conversation, not just your last line.", color:C.blue },
-  { n:2, title:"Claude reads context", detail:"The model processes your words, the conversation history, and any files you've shared — all at once.", color:C.purple },
-  { n:3, title:"Patterns activate", detail:"Billions of learned associations from training fire together to build an understanding of what you need.", color:C.amber },
-  { n:4, title:"Response is generated", detail:"Claude predicts the most helpful, honest, and harmless continuation — word by word, shaped by its values.", color:C.green },
-  { n:5, title:"You reply & refine", detail:"The conversation continues. Claude remembers everything said, so you can build on prior context naturally.", color:C.accent },
-];
-
-// ── SECTIONS ──────────────────────────────────────────────────────────────────
-
-function SectionWhatItIs() {
-  return (
-    <div style={{display:"flex",flexDirection:"column",gap:16}}>
-      <Card accent={C.accent}>
-        <div style={{paddingTop:8}}>
-          <Tag color={C.accent}>DEFINITION</Tag>
-          <P style={{marginTop:12,fontSize:15,color:C.text,fontFamily:font.body,fontWeight:500,lineHeight:1.7}}>
-            Claude is an AI assistant made by Anthropic — a company whose mission is building AI that is safe and beneficial.
-            You have a conversation with Claude in plain language, and it responds like a thoughtful, knowledgeable collaborator.
-          </P>
-        </div>
-      </Card>
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16}}>
-        <Card>
-          <H3 color={C.blue}>The Analogy</H3>
-          <P>Think of a very well-read colleague who is always available, never gets tired, and can switch from debugging your code to drafting a board memo in the same conversation.</P>
-        </Card>
-        <Card>
-          <H3 color={C.purple}>Not a Search Engine</H3>
-          <P>Claude doesn't retrieve web pages. It reasons, synthesises, and generates — producing answers tailored to exactly what you asked, not a list of links.</P>
-        </Card>
-      </div>
-      <Card style={{background:`${C.purple}06`,border:`1px solid ${C.purple}20`}}>
-        <Tag color={C.purple}>KEY INSIGHT</Tag>
-        <P style={{marginTop:8}}>The defining property of Claude isn't what it knows — it's how it understands. It grasps intent, detects ambiguity, and adjusts its output to fit your actual situation.</P>
-      </Card>
-    </div>
-  );
-}
-
-function SectionHowItThinks() {
-  const [active, setActive] = useState(null);
-  return (
-    <div style={{display:"flex",flexDirection:"column",gap:12}}>
-      <P style={{marginBottom:4}}>Click any step to see what's happening inside.</P>
-      {HOW_STEPS.map((s,i) => (
-        <Card key={i} onClick={() => setActive(active===i?null:i)}
-          accent={active===i?s.color:undefined}
-          style={{border:active===i?`2px solid ${s.color}`:`1px solid ${C.border}`,
-            padding:active===i?"16px 19px":20,transition:"all 0.2s"}}>
-          <div style={{display:"flex",gap:14,alignItems:"center"}}>
-            <div style={{width:32,height:32,borderRadius:4,background:s.color,
-              display:"flex",alignItems:"center",justifyContent:"center",
-              fontFamily:font.mono,fontSize:14,fontWeight:600,color:"#fff",flexShrink:0}}>{s.n}</div>
-            <div style={{flex:1}}>
-              <H3 color={active===i?s.color:C.text}>{s.title}</H3>
-              <P style={{fontSize:12.5}}>{s.detail}</P>
-            </div>
-            <span style={{fontFamily:font.mono,fontSize:11,color:C.muted}}>{active===i?"▲":"▼"}</span>
-          </div>
-          {active===i && (
-            <div style={{marginTop:12,padding:12,background:`${s.color}05`,
-              border:`1px solid ${s.color}15`,borderRadius:4}}>
-              <P style={{fontSize:12.5,color:s.color,fontWeight:500}}>
-                {s.n===1 && "Even a vague message like 'help me with this thing' gives Claude signal about tone, formality, and what kind of response you need."}
-                {s.n===2 && "This is why Claude feels coherent across a long conversation — it never 'forgets' what was said earlier in the thread."}
-                {s.n===3 && "Training on diverse human text means Claude has internalized patterns of reasoning, style, and domain knowledge — not just facts."}
-                {s.n===4 && "Values like honesty, helpfulness, and harm avoidance are embedded in the training process, not bolted on as filters afterward."}
-                {s.n===5 && "Unlike a single-shot query, conversations let you iterate, push back, ask for alternatives, and refine toward exactly what you need."}
-              </P>
-            </div>
-          )}
-        </Card>
-      ))}
-    </div>
-  );
-}
-
-function SectionCapabilities() {
-  const [active, setActive] = useState(0);
-  const item = CAPABILITIES[active];
-  return (
-    <div style={{display:"flex",flexDirection:"column",gap:16}}>
-      <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
-        {CAPABILITIES.map((c,i) => (
-          <button key={i} onClick={() => setActive(i)} style={{
-            fontFamily:font.heading,fontSize:12,fontWeight:active===i?700:500,
-            color:active===i?c.color:C.sub,
-            background:active===i?`${c.color}08`:"transparent",
-            border:`1px solid ${active===i?`${c.color}30`:"transparent"}`,
-            borderRadius:4,padding:"8px 14px",cursor:"pointer",transition:"all 0.2s"
-          }}>{c.label}</button>
-        ))}
-      </div>
-      <Card accent={item.color} style={{border:`2px solid ${item.color}30`}}>
-        <div style={{paddingTop:8}}>
-          <Tag color={item.color}>{item.label.toUpperCase()}</Tag>
-          <H3 style={{marginTop:10}} color={item.color}>{item.short}</H3>
-          <P>{item.detail}</P>
-          <div style={{marginTop:16}}>
-            <div style={{fontFamily:font.mono,fontSize:10,color:C.muted,
-              textTransform:"uppercase",letterSpacing:1,marginBottom:10}}>EXAMPLE PROMPTS</div>
-            {item.examples.map((ex,i) => (
-              <div key={i} style={{display:"flex",gap:10,alignItems:"flex-start",
-                padding:"8px 0",borderBottom:i<item.examples.length-1?`1px solid ${C.border}`:"none"}}>
-                <span style={{fontFamily:font.mono,fontSize:11,color:item.color,flexShrink:0}}>→</span>
-                <P style={{fontSize:12.5,color:C.text}}>"{ex}"</P>
-              </div>
-            ))}
-          </div>
-        </div>
-      </Card>
-    </div>
-  );
-}
-
-function SectionVsOtherAI() {
-  return (
-    <div style={{display:"flex",flexDirection:"column",gap:16}}>
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16}}>
-        <Card>
-          <H3 color={C.red}>Generic AI assistants</H3>
-          {VS_ITEMS.map((v,i) => (
-            <div key={i} style={{display:"flex",gap:10,alignItems:"flex-start",
-              padding:"8px 0",borderBottom:i<VS_ITEMS.length-1?`1px solid ${C.border}`:"none"}}>
-              <span style={{fontFamily:font.mono,fontSize:11,color:C.red,flexShrink:0,marginTop:1}}>✗</span>
-              <div>
-                <div style={{fontFamily:font.mono,fontSize:10,color:C.muted,
-                  textTransform:"uppercase",letterSpacing:1,marginBottom:2}}>{v.label}</div>
-                <P style={{fontSize:12}}>{v.other}</P>
-              </div>
-            </div>
-          ))}
-        </Card>
-        <Card accent={C.green}>
-          <div style={{paddingTop:8}}>
-          <H3 color={C.green}>Claude</H3>
-          {VS_ITEMS.map((v,i) => (
-            <div key={i} style={{display:"flex",gap:10,alignItems:"flex-start",
-              padding:"8px 0",borderBottom:i<VS_ITEMS.length-1?`1px solid ${C.border}`:"none"}}>
-              <span style={{fontFamily:font.mono,fontSize:11,color:C.green,flexShrink:0,marginTop:1}}>✓</span>
-              <div>
-                <div style={{fontFamily:font.mono,fontSize:10,color:C.muted,
-                  textTransform:"uppercase",letterSpacing:1,marginBottom:2}}>{v.label}</div>
-                <P style={{fontSize:12}}>{v.claude}</P>
-              </div>
-            </div>
-          ))}
-          </div>
-        </Card>
-      </div>
-      <Card style={{background:`${C.purple}06`,border:`1px solid ${C.purple}20`}}>
-        <Tag color={C.purple}>KEY INSIGHT</Tag>
-        <P style={{marginTop:8}}>The difference isn't benchmark scores — it's character. Claude is designed to be genuinely helpful, calibrated about uncertainty, and honest even when a different answer would be easier.</P>
-      </Card>
-    </div>
-  );
-}
-
-function SectionGetStarted() {
-  const tips = [
-    { title:"Be specific about context", detail:"Tell Claude who you are and what you're trying to accomplish. 'I'm a product manager writing a spec for engineers' gives it much more to work with.", color:C.blue },
-    { title:"Iterate, don't restart", detail:"If Claude's first answer isn't right, tell it what's off. 'Make it shorter', 'More formal', 'That's not the constraint I meant'. Don't re-prompt from scratch.", color:C.purple },
-    { title:"Ask it to explain", detail:"Claude is often more useful when asked to show its reasoning: 'Walk me through how you got to that recommendation'.", color:C.amber },
-    { title:"Give it documents to work with", detail:"Paste in the raw material — the email, the code, the report — and ask Claude to act on it. It reads long inputs well.", color:C.green },
-    { title:"Push back when wrong", detail:"Claude is fallible. If something seems off, say so. It will reconsider, and it won't get defensive.", color:C.accent },
-  ];
-  const [open, setOpen] = useState(null);
-  return (
-    <div style={{display:"flex",flexDirection:"column",gap:12}}>
-      <P style={{marginBottom:4}}>Five practices that immediately improve your results with Claude.</P>
-      {tips.map((t,i) => (
-        <Card key={i} onClick={() => setOpen(open===i?null:i)}
-          style={{cursor:"pointer",transition:"all 0.2s",
-            border:open===i?`2px solid ${t.color}`:`1px solid ${C.border}`,
-            padding:open===i?"16px 19px":20}}>
-          <div style={{display:"flex",alignItems:"center",gap:12}}>
-            <div style={{width:24,height:24,borderRadius:4,background:`${t.color}15`,
-              display:"flex",alignItems:"center",justifyContent:"center",
-              fontFamily:font.mono,fontSize:11,color:t.color,fontWeight:600,flexShrink:0}}>{i+1}</div>
-            <H3 color={open===i?t.color:C.text}>{t.title}</H3>
-            <span style={{fontFamily:font.mono,fontSize:11,color:C.muted,marginLeft:"auto"}}>{open===i?"▲":"▼"}</span>
-          </div>
-          {open===i && (
-            <div style={{marginTop:10,paddingLeft:36}}>
-              <P>{t.detail}</P>
-            </div>
-          )}
-        </Card>
-      ))}
-    </div>
-  );
-}
-
-// ── MAIN ──────────────────────────────────────────────────────────────────────
-
-export default function ClaudeExplainer() {
-  const [tab, setTab] = useState(0);
-  const TABS = ["What It Is","How It Thinks","Capabilities","vs Other AI","Get Started"];
-  const sections = [<SectionWhatItIs/>,<SectionHowItThinks/>,<SectionCapabilities/>,<SectionVsOtherAI/>,<SectionGetStarted/>];
-  return (
-    <div style={{background:C.bg,minHeight:"100vh",fontFamily:font.body,color:C.text}}>
-      <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
-      <div style={{padding:"32px 24px 0",maxWidth:800,margin:"0 auto"}}>
-        <div style={{marginBottom:4}}>
-          <span style={{fontFamily:font.mono,fontSize:11,color:C.accent,background:`${C.accent}10`,
-            padding:"2px 10px",borderRadius:3,letterSpacing:2,textTransform:"uppercase"}}>Visual Explainer</span>
-        </div>
-        <h1 style={{fontFamily:font.heading,fontSize:30,fontWeight:700,color:C.text,
-          margin:"8px 0 4px",lineHeight:1.2,letterSpacing:-0.5}}>What is Claude?</h1>
-        <P>Anthropic's AI assistant — what it is, how it thinks, and why it behaves differently from other AI.</P>
-      </div>
-      <div style={{maxWidth:800,margin:"20px auto 0",padding:"0 24px",display:"flex",gap:4,flexWrap:"wrap"}}>
-        {TABS.map((t,i) => (
-          <button key={i} onClick={() => setTab(i)} style={{
-            fontFamily:font.heading,fontSize:12,fontWeight:tab===i?700:500,
-            color:tab===i?C.accent:C.sub,background:tab===i?`${C.accent}08`:"transparent",
-            border:`1px solid ${tab===i?`${C.accent}30`:"transparent"}`,
-            borderRadius:4,padding:"8px 14px",cursor:"pointer",transition:"all 0.2s"}}>{t}</button>
-        ))}
-      </div>
-      <div style={{maxWidth:800,margin:"16px auto 40px",padding:"0 24px"}}>
-        {sections[tab]}
-      </div>
-      <div style={{maxWidth:800,margin:"0 auto",padding:"16px 24px 32px",borderTop:`1px solid ${C.border}`}}>
-        <P style={{fontSize:11,color:C.muted,textAlign:"center"}}>
-          Claude is built by Anthropic · Part of the <a href="index.html" style={{color:C.accent,textDecoration:"none"}}>AI Concepts Explainer Series</a> · <a href="agents.html" style={{color:C.accent,textDecoration:"none"}}>Next: AI Agents →</a>
-        </P>
-      </div>
-    </div>
-  );
-}
-ReactDOM.createRoot(document.getElementById('root')).render(<ClaudeExplainer/>);
-</script></body></html>
+    document.querySelectorAll('.expand-card').forEach(card => {
+      card.addEventListener('click', function () {
+        this.classList.toggle('expanded');
+      });
+    });
+  </script>
+</body>
+</html>

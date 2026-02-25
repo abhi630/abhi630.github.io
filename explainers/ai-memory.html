@@ -1,224 +1,579 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>How AI Memory Works — Visual Explainer</title>
-<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-<style>*{box-sizing:border-box;margin:0;padding:0}body{background:#f8f8f6}</style>
-</head><body><div id="root"></div>
-<script type="text/babel">
-const { useState } = React;
-const C = { bg:"#f8f8f6",card:"#fff",border:"#e5e5e0",text:"#222",sub:"#666",muted:"#999",accent:"#ea580c",blue:"#0891b2",purple:"#7c3aed",green:"#16a34a",amber:"#ca8a04",red:"#dc2626" };
-const font = { heading:"'Space Grotesk', sans-serif", body:"'IBM Plex Sans', sans-serif", mono:"'JetBrains Mono', monospace" };
-const Card = ({ children, style, accent, onClick }) => (
-  <div onClick={onClick} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:4,padding:20,position:"relative",overflow:"hidden",boxShadow:"0 1px 3px rgba(0,0,0,0.04)",cursor:onClick?"pointer":"default",...style}}>
-    {accent && <div style={{position:"absolute",top:0,left:0,right:0,height:3,background:accent}}/>}
-    {children}
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>How AI Memory Works</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background: #f8f8f6;
+      font-family: 'IBM Plex Sans', sans-serif;
+      color: #333;
+      padding: 40px 20px;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 30px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin-bottom: 12px;
+    }
+    .subtitle {
+      font-size: 15px;
+      color: #666;
+      margin-bottom: 32px;
+      line-height: 1.6;
+    }
+    .tabs {
+      display: flex;
+      gap: 0;
+      margin-bottom: 32px;
+      border-bottom: 1px solid #e5e5e0;
+      overflow-x: auto;
+    }
+    .tab {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 12px 16px;
+      cursor: pointer;
+      color: #666;
+      border: none;
+      background: none;
+      border-bottom: 2px solid transparent;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+    }
+    .tab:hover {
+      color: #333;
+    }
+    .tab.active {
+      color: #ea580c;
+      background: #ea580c08;
+      border-bottom: 2px solid #ea580c;
+    }
+    .sections {
+      position: relative;
+    }
+    .section {
+      display: none;
+    }
+    .section.active {
+      display: block;
+    }
+    .card {
+      background: white;
+      border: 1px solid #e5e5e0;
+      border-radius: 4px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+      padding: 24px;
+      margin-bottom: 20px;
+      position: relative;
+      padding-top: 28px;
+    }
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 3px;
+      width: 100%;
+      border-radius: 4px 4px 0 0;
+    }
+    .card.blue::before {
+      background: #0891b2;
+    }
+    .card.purple::before {
+      background: #7c3aed;
+    }
+    .card.green::before {
+      background: #16a34a;
+    }
+    .card.orange::before {
+      background: #ea580c;
+    }
+    .card.amber::before {
+      background: #ca8a04;
+    }
+    .card h3 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+    .card h4 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      margin: 12px 0 6px 0;
+    }
+    .card p {
+      font-size: 14px;
+      line-height: 1.6;
+      color: #555;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    @media (max-width: 600px) {
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+    }
+    .expand-card {
+      background: white;
+      border: 1px solid #e5e5e0;
+      border-radius: 4px;
+      padding: 20px;
+      margin-bottom: 16px;
+      cursor: pointer;
+      position: relative;
+      padding-left: 28px;
+      transition: box-shadow 0.2s ease;
+    }
+    .expand-card:hover {
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    }
+    .expand-card::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      border-radius: 4px 0 0 4px;
+    }
+    .expand-card.blue::before {
+      background: #0891b2;
+    }
+    .expand-card.purple::before {
+      background: #7c3aed;
+    }
+    .expand-card.green::before {
+      background: #16a34a;
+    }
+    .expand-card.orange::before {
+      background: #ea580c;
+    }
+    .expand-card.amber::before {
+      background: #ca8a04;
+    }
+    .expand-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .expand-content {
+      font-size: 13px;
+      line-height: 1.5;
+      color: #666;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+    }
+    .expand-card.expanded .expand-content {
+      max-height: 400px;
+    }
+    .expand-icon {
+      font-size: 12px;
+      float: right;
+      transition: transform 0.3s ease;
+    }
+    .expand-card.expanded .expand-icon {
+      transform: rotate(180deg);
+    }
+    .subtabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .subtab {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 8px 12px;
+      background: white;
+      border: 1px solid #e5e5e0;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .subtab:hover {
+      border-color: #d0d0cb;
+    }
+    .subtab.active {
+      background: #ea580c;
+      color: white;
+      border-color: #ea580c;
+    }
+    .subtab.blue.active {
+      background: #0891b2;
+      border-color: #0891b2;
+    }
+    .subtab.purple.active {
+      background: #7c3aed;
+      border-color: #7c3aed;
+    }
+    .subtab.green.active {
+      background: #16a34a;
+      border-color: #16a34a;
+    }
+    .subtab.orange.active {
+      background: #ea580c;
+      border-color: #ea580c;
+    }
+    .subtab.amber.active {
+      background: #ca8a04;
+      border-color: #ca8a04;
+    }
+    .subtab-content {
+      display: none;
+    }
+    .subtab-content.active {
+      display: block;
+    }
+    .step-buttons {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    @media (max-width: 600px) {
+      .step-buttons {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    .step-button {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 12px;
+      background: white;
+      border: 2px solid;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: center;
+    }
+    .step-button.blue {
+      border-color: #0891b2;
+      color: #0891b2;
+    }
+    .step-button.purple {
+      border-color: #7c3aed;
+      color: #7c3aed;
+    }
+    .step-button.amber {
+      border-color: #ca8a04;
+      color: #ca8a04;
+    }
+    .step-button.green {
+      border-color: #16a34a;
+      color: #16a34a;
+    }
+    .step-button.orange {
+      border-color: #ea580c;
+      color: #ea580c;
+    }
+    .step-button.active {
+      color: white;
+    }
+    .step-button.blue.active {
+      background: #0891b2;
+    }
+    .step-button.purple.active {
+      background: #7c3aed;
+    }
+    .step-button.amber.active {
+      background: #ca8a04;
+    }
+    .step-button.green.active {
+      background: #16a34a;
+    }
+    .step-button.orange.active {
+      background: #ea580c;
+    }
+    .step-content {
+      display: none;
+    }
+    .step-content.active {
+      display: block;
+    }
+    .footer {
+      margin-top: 48px;
+      padding-top: 24px;
+      border-top: 1px solid #e5e5e0;
+      font-size: 13px;
+      color: #999;
+      text-align: center;
+    }
+    .footer a {
+      color: #0891b2;
+      text-decoration: none;
+    }
+    .footer a:hover {
+      text-decoration: underline;
+    }
+    .comparison-card {
+      background: white;
+      border: 1px solid #e5e5e0;
+      border-radius: 4px;
+      padding: 20px;
+      margin-bottom: 12px;
+      position: relative;
+      padding-left: 28px;
+    }
+    .comparison-card::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      border-radius: 4px 0 0 4px;
+    }
+    .comparison-card.red::before {
+      background: #dc2626;
+    }
+    .comparison-card.amber::before {
+      background: #ca8a04;
+    }
+    .comparison-card.purple::before {
+      background: #7c3aed;
+    }
+    .comparison-card h4 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .comparison-card p {
+      font-size: 13px;
+      line-height: 1.5;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>How AI Memory Works</h1>
+    <p class="subtitle">The four types of memory in AI systems, how they're layered together, and the trade-offs every design must navigate.</p>
+    
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab(0)">The Problem</button>
+      <button class="tab" onclick="switchTab(1)">Memory Types</button>
+      <button class="tab" onclick="switchTab(2)">How It Works</button>
+      <button class="tab" onclick="switchTab(3)">Trade-offs</button>
+    </div>
+
+    <div class="sections">
+      <!-- Tab 0: The Problem -->
+      <div class="section active">
+        <div class="card orange">
+          <p><strong>A language model has no persistent memory by default. Every conversation starts fresh — it doesn't know who you are, what you discussed last time, or what's in your company's documents. Memory systems are how we fix this.</strong></p>
+        </div>
+
+        <div class="grid-2">
+          <div class="card" style="position: relative; padding-top: 28px;"><div style="position: absolute; top: 0; left: 0; height: 3px; width: 100%; background: #dc2626; border-radius: 4px 4px 0 0;"></div>
+            <h3 style="color: #dc2626;">Without memory</h3>
+            <p>Every session starts blank. You re-explain context every time. The model can't personalise or build on past work.</p>
+          </div>
+          <div class="card green">
+            <h3>With memory</h3>
+            <p>The AI knows your preferences, past decisions, and domain knowledge. It can reference documents and pick up where it left off.</p>
+          </div>
+        </div>
+
+        <div class="card purple">
+          <p><strong>There's no single 'memory' in AI — there are four distinct types, each with different properties.</strong> Practical systems layer multiple types together to get the right trade-offs.</p>
+        </div>
+      </div>
+
+      <!-- Tab 1: Memory Types -->
+      <div class="section">
+        <div class="subtabs">
+          <button class="subtab blue active" onclick="switchSubtab(event, 0)">In-Context</button>
+          <button class="subtab purple" onclick="switchSubtab(event, 1)">External/RAG</button>
+          <button class="subtab amber" onclick="switchSubtab(event, 2)">Parametric</button>
+          <button class="subtab green" onclick="switchSubtab(event, 3)">Episodic</button>
+        </div>
+
+        <div class="subtab-content active">
+          <div class="card blue">
+            <h3>In-Context Memory</h3>
+            <p><strong>What:</strong> Everything in the current conversation window — messages, files, system instructions.</p>
+            <p style="margin-top: 12px;"><strong>How:</strong> The model reads the entire context on every response. Nothing is 'retrieved' — it's all just there.</p>
+            <p style="margin-top: 12px;"><strong>Limits:</strong> Fixed window size (e.g. 200k tokens). Disappears when the session ends. Older content may be truncated.</p>
+            <p style="margin-top: 12px;"><strong>Analogy:</strong> Working memory / RAM — fast, immediate, but finite and volatile.</p>
+          </div>
+        </div>
+
+        <div class="subtab-content">
+          <div class="card purple">
+            <h3>External / RAG</h3>
+            <p><strong>What:</strong> A searchable database of documents, notes, or past conversations stored outside the model.</p>
+            <p style="margin-top: 12px;"><strong>How:</strong> A retrieval system finds the most relevant chunks at query time and injects them into context.</p>
+            <p style="margin-top: 12px;"><strong>Limits:</strong> Retrieval quality depends on the search. Irrelevant chunks waste context. Slow compared to in-context.</p>
+            <p style="margin-top: 12px;"><strong>Analogy:</strong> A library with a librarian — you ask, they fetch the relevant book, you read the relevant page.</p>
+          </div>
+        </div>
+
+        <div class="subtab-content">
+          <div class="card amber">
+            <h3>Parametric</h3>
+            <p><strong>What:</strong> Knowledge baked into model weights during training — facts, language, reasoning patterns.</p>
+            <p style="margin-top: 12px;"><strong>How:</strong> Not retrieved at runtime. The model 'knows' it the same way you know how to ride a bike.</p>
+            <p style="margin-top: 12px;"><strong>Limits:</strong> Static after training. Can be wrong, outdated, or hallucinated. Can't be updated without retraining.</p>
+            <p style="margin-top: 12px;"><strong>Analogy:</strong> Long-term memory — things you just know, deeply ingrained, but possibly incorrect.</p>
+          </div>
+        </div>
+
+        <div class="subtab-content">
+          <div class="card green">
+            <h3>Episodic</h3>
+            <p><strong>What:</strong> Structured logs of past interactions, decisions, or task outcomes stored in a database or file.</p>
+            <p style="margin-top: 12px;"><strong>How:</strong> The agent writes summaries or key facts to storage after each session. Future sessions load relevant memories.</p>
+            <p style="margin-top: 12px;"><strong>Limits:</strong> Requires explicit design. Quality depends on what gets written and how it's retrieved.</p>
+            <p style="margin-top: 12px;"><strong>Analogy:</strong> A notebook — what you consciously chose to write down and can look up later.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 2: How It Works -->
+      <div class="section">
+        <div class="step-buttons">
+          <button class="step-button blue active" onclick="switchStep(event, 0)">1</button>
+          <button class="step-button purple" onclick="switchStep(event, 1)">2</button>
+          <button class="step-button amber" onclick="switchStep(event, 2)">3</button>
+          <button class="step-button green" onclick="switchStep(event, 3)">4</button>
+          <button class="step-button orange" onclick="switchStep(event, 4)">5</button>
+        </div>
+
+        <div class="step-content active">
+          <div class="card blue">
+            <h3>User sends a message</h3>
+            <p>The prompt enters the pipeline. Before reaching the model, a memory router decides what additional context to fetch.</p>
+          </div>
+        </div>
+
+        <div class="step-content">
+          <div class="card purple">
+            <h3>Retrieval (if needed)</h3>
+            <p>For external memory, the query is embedded as a vector and compared against stored document chunks. Top-K most similar are retrieved.</p>
+          </div>
+        </div>
+
+        <div class="step-content">
+          <div class="card amber">
+            <h3>Context assembly</h3>
+            <p>Retrieved chunks + conversation history + system instructions are assembled into the full context window the model will read.</p>
+          </div>
+        </div>
+
+        <div class="step-content">
+          <div class="card green">
+            <h3>Model generates response</h3>
+            <p>The model reads the assembled context — all the 'memory' at once — and produces its response based on the full picture.</p>
+          </div>
+        </div>
+
+        <div class="step-content">
+          <div class="card orange">
+            <h3>Memory update (optional)</h3>
+            <p>After the response, an episodic system may write a summary to durable storage, for future sessions to load.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 3: Trade-offs -->
+      <div class="section">
+        <div class="expand-card blue">
+          <span class="expand-icon">▼</span>
+          <div class="expand-title">Speed</div>
+          <div class="expand-content"><strong>How fast is the memory accessible?</strong><br><br><strong>Wins:</strong> In-context & Parametric (always loaded)<br><strong>Loses:</strong> External (requires retrieval round-trip)</div>
+        </div>
+
+        <div class="expand-card amber">
+          <span class="expand-icon">▼</span>
+          <div class="expand-title">Capacity</div>
+          <div class="expand-content"><strong>How much can be stored?</strong><br><br><strong>Wins:</strong> External RAG (virtually unlimited)<br><strong>Loses:</strong> In-context (bounded by window size)</div>
+        </div>
+
+        <div class="expand-card green">
+          <span class="expand-icon">▼</span>
+          <div class="expand-title">Persistence</div>
+          <div class="expand-content"><strong>Does it survive session end?</strong><br><br><strong>Wins:</strong> External & Parametric (durable)<br><strong>Loses:</strong> In-context (lost when session closes)</div>
+        </div>
+
+        <div class="expand-card purple">
+          <span class="expand-icon">▼</span>
+          <div class="expand-title">Accuracy</div>
+          <div class="expand-content"><strong>How precisely is the right info found?</strong><br><br><strong>Wins:</strong> In-context (everything visible at once)<br><strong>Loses:</strong> External (retrieval may miss key chunks)</div>
+        </div>
+
+        <div class="expand-card orange">
+          <span class="expand-icon">▼</span>
+          <div class="expand-title">Updatability</div>
+          <div class="expand-content"><strong>Can you add new info without retraining?</strong><br><br><strong>Wins:</strong> External & Episodic (add docs anytime)<br><strong>Loses:</strong> Parametric (frozen in weights)</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      ← <a href="claude-cowork.html">Claude Cowork</a> · <a href="index.html">AI Concepts Series</a> · <a href="agentic-system.html">Agentic Systems</a> →
+    </div>
   </div>
-);
-const Tag = ({ color, children }) => <span style={{fontFamily:font.mono,fontSize:11,color,background:`${color}12`,border:`1px solid ${color}30`,padding:"2px 10px",borderRadius:3,letterSpacing:0.5,display:"inline-block"}}>{children}</span>;
-const H3 = ({ children, color }) => <h3 style={{fontFamily:font.heading,fontSize:16,fontWeight:700,color:color||C.text,margin:"0 0 8px"}}>{children}</h3>;
-const P = ({ children, style }) => <p style={{fontFamily:font.body,fontSize:13.5,color:C.sub,lineHeight:1.65,margin:0,...style}}>{children}</p>;
 
-const MEMORY_TYPES = [
-  { id:"context", label:"In-Context Memory", color:C.blue,
-    what:"Everything in the current conversation window — messages, files, system instructions.",
-    how:"The model reads the entire context on every response. Nothing is 'retrieved' — it's all just there.",
-    limit:"Fixed window size (e.g. 200k tokens). Older content may be truncated. Disappears when the session ends.",
-    analogy:"Working memory / RAM — fast, immediate, but finite and volatile.",
-    score:{ speed:5, capacity:2, persistence:1 } },
-  { id:"external", label:"External Memory (RAG)", color:C.purple,
-    what:"A searchable database of documents, notes, or past conversations stored outside the model.",
-    how:"A retrieval system finds the most relevant chunks at query time and injects them into context.",
-    limit:"Retrieval quality depends on the search. Irrelevant chunks waste context. Slow compared to in-context.",
-    analogy:"A library with a librarian — you ask, they fetch the relevant book, you read the relevant page.",
-    score:{ speed:3, capacity:5, persistence:5 } },
-  { id:"parametric", label:"Parametric Memory", color:C.amber,
-    what:"Knowledge baked into model weights during training — facts, language, reasoning patterns.",
-    how:"Not retrieved at runtime. The model 'knows' it the same way you know how to ride a bike.",
-    limit:"Static after training. Can be wrong, outdated, or hallucinated. Can't be updated without retraining.",
-    analogy:"Long-term memory — things you just know, deeply ingrained, but possibly incorrect.",
-    score:{ speed:5, capacity:3, persistence:5 } },
-  { id:"episodic", label:"Episodic / Tool Memory", color:C.green,
-    what:"Structured logs of past interactions, decisions, or task outcomes stored in a database or file.",
-    how:"The agent writes summaries or key facts to storage after each session. Future sessions load relevant memories.",
-    limit:"Requires explicit design. Quality depends on what gets written and how it's retrieved.",
-    analogy:"A notebook — what you consciously chose to write down and can look up later.",
-    score:{ speed:3, capacity:4, persistence:5 } },
-];
+  <script>
+    function switchTab(i) {
+      document.querySelectorAll('.tab').forEach((t, j) => {
+        t.classList.toggle('active', i === j);
+      });
+      document.querySelectorAll('.section').forEach((s, j) => {
+        s.classList.toggle('active', i === j);
+      });
+    }
 
-const TRADEOFFS = [
-  { dim:"Speed", desc:"How fast is the memory accessible?", winner:"In-context & Parametric (always loaded)", loser:"External (requires retrieval round-trip)" },
-  { dim:"Capacity", desc:"How much can be stored?", winner:"External RAG (virtually unlimited)", loser:"In-context (bounded by window size)" },
-  { dim:"Persistence", desc:"Does it survive session end?", winner:"External & Parametric (durable)", loser:"In-context (lost when session closes)" },
-  { dim:"Accuracy", desc:"How precisely is the right info found?", winner:"In-context (everything visible at once)", loser:"External (retrieval may miss key chunks)" },
-  { dim:"Updatability", desc:"Can you add new info without retraining?", winner:"External & Episodic (add docs anytime)", loser:"Parametric (frozen in weights)" },
-];
+    function switchSubtab(event, i) {
+      const container = event.target.parentElement;
+      container.querySelectorAll('.subtab').forEach((t, j) => {
+        t.classList.toggle('active', i === j);
+      });
+      container.parentElement.querySelectorAll('.subtab-content').forEach((s, j) => {
+        s.classList.toggle('active', i === j);
+      });
+    }
 
-function Bar({ value, max=5, color }) {
-  return (
-    <div style={{display:"flex",gap:3,alignItems:"center"}}>
-      {Array.from({length:max}).map((_,i) => (
-        <div key={i} style={{width:14,height:8,borderRadius:2,background:i<value?color:`${color}20`}}/>
-      ))}
-    </div>
-  );
-}
+    function switchStep(event, i) {
+      const container = event.target.parentElement;
+      container.querySelectorAll('.step-button').forEach((t, j) => {
+        t.classList.toggle('active', i === j);
+      });
+      container.parentElement.querySelectorAll('.step-content').forEach((s, j) => {
+        s.classList.toggle('active', i === j);
+      });
+    }
 
-function SectionProblem() {
-  return (
-    <div style={{display:"flex",flexDirection:"column",gap:16}}>
-      <Card accent={C.accent}>
-        <div style={{paddingTop:8}}>
-          <Tag color={C.accent}>THE CHALLENGE</Tag>
-          <P style={{marginTop:12,fontSize:15,color:C.text,fontWeight:500,lineHeight:1.7}}>
-            A language model has no persistent memory by default. Every conversation starts fresh — it doesn't know who you are, what you discussed last time, or what's in your company's documents. Memory systems are how we fix this.
-          </P>
-        </div>
-      </Card>
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16}}>
-        <Card>
-          <H3 color={C.red}>Without memory</H3>
-          <P>Every session starts blank. You re-explain context every time. The model can't personalise or build on past work. Long documents can't be referenced.</P>
-        </Card>
-        <Card>
-          <H3 color={C.green}>With memory</H3>
-          <P>The AI knows your preferences, past decisions, and domain knowledge. It can reference documents you've loaded and pick up where it left off.</P>
-        </Card>
-      </div>
-      <Card style={{background:`${C.purple}06`,border:`1px solid ${C.purple}20`}}>
-        <Tag color={C.purple}>KEY INSIGHT</Tag>
-        <P style={{marginTop:8}}>There's no single "memory" in AI — there are four distinct types, each with different properties. Practical systems layer multiple types together to get the right trade-offs.</P>
-      </Card>
-    </div>
-  );
-}
-
-function SectionTypes() {
-  const [active, setActive] = useState(0);
-  const m = MEMORY_TYPES[active];
-  return (
-    <div style={{display:"flex",flexDirection:"column",gap:16}}>
-      <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
-        {MEMORY_TYPES.map((mt,i) => (
-          <button key={i} onClick={() => setActive(i)} style={{fontFamily:font.heading,fontSize:12,fontWeight:active===i?700:500,color:active===i?mt.color:C.sub,background:active===i?`${mt.color}08`:"transparent",border:`1px solid ${active===i?`${mt.color}30`:"transparent"}`,borderRadius:4,padding:"8px 14px",cursor:"pointer",transition:"all 0.2s"}}>{mt.label.split(" ")[0]}</button>
-        ))}
-      </div>
-      <Card accent={m.color} style={{border:`2px solid ${m.color}30`}}>
-        <div style={{paddingTop:8}}>
-          <Tag color={m.color}>{m.label.toUpperCase()}</Tag>
-          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginTop:14}}>
-            <div style={{padding:12,background:`${m.color}05`,border:`1px solid ${m.color}15`,borderRadius:4}}>
-              <div style={{fontFamily:font.mono,fontSize:10,color:m.color,textTransform:"uppercase",letterSpacing:1,marginBottom:6}}>WHAT IS IT</div>
-              <P style={{fontSize:12.5}}>{m.what}</P>
-            </div>
-            <div style={{padding:12,background:`${m.color}05`,border:`1px solid ${m.color}15`,borderRadius:4}}>
-              <div style={{fontFamily:font.mono,fontSize:10,color:m.color,textTransform:"uppercase",letterSpacing:1,marginBottom:6}}>HOW IT WORKS</div>
-              <P style={{fontSize:12.5}}>{m.how}</P>
-            </div>
-          </div>
-          <div style={{marginTop:12,padding:12,background:`${C.red}05`,border:`1px solid ${C.red}15`,borderRadius:4}}>
-            <div style={{fontFamily:font.mono,fontSize:10,color:C.red,textTransform:"uppercase",letterSpacing:1,marginBottom:6}}>LIMITATION</div>
-            <P style={{fontSize:12.5}}>{m.limit}</P>
-          </div>
-          <div style={{marginTop:12,padding:12,background:"#f4f4f0",border:`1px solid ${C.border}`,borderRadius:4}}>
-            <div style={{fontFamily:font.mono,fontSize:10,color:C.muted,textTransform:"uppercase",letterSpacing:1,marginBottom:6}}>ANALOGY</div>
-            <P style={{fontSize:12.5,color:C.text,fontStyle:"italic"}}>{m.analogy}</P>
-          </div>
-          <div style={{marginTop:14,display:"flex",gap:24}}>
-            {Object.entries(m.score).map(([k,v]) => (
-              <div key={k}>
-                <div style={{fontFamily:font.mono,fontSize:10,color:C.muted,textTransform:"uppercase",letterSpacing:1,marginBottom:6}}>{k}</div>
-                <Bar value={v} color={m.color}/>
-              </div>
-            ))}
-          </div>
-        </div>
-      </Card>
-    </div>
-  );
-}
-
-function SectionHowItWorks() {
-  const [step, setStep] = useState(0);
-  const steps = [
-    { title:"User sends a message", detail:"The prompt enters the pipeline. Before reaching the model, a memory router decides what additional context to fetch.", color:C.blue },
-    { title:"Retrieval (if needed)", detail:"For external memory, the query is embedded as a vector and compared against stored document chunks. The top-K most similar are retrieved.", color:C.purple },
-    { title:"Context assembly", detail:"Retrieved chunks + conversation history + system instructions are assembled into the full context window that the model will read.", color:C.amber },
-    { title:"Model generates response", detail:"The model reads the assembled context — all the 'memory' at once — and produces its response based on the full picture.", color:C.green },
-    { title:"Memory update (optional)", detail:"After the response, an episodic system may write a summary of what happened to durable storage, for future sessions to load.", color:C.accent },
-  ];
-  return (
-    <div style={{display:"flex",flexDirection:"column",gap:12}}>
-      <P style={{marginBottom:4}}>How a production RAG + episodic memory pipeline works step by step.</P>
-      <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:8}}>
-        {steps.map((s,i) => (
-          <button key={i} onClick={() => setStep(i)} style={{fontFamily:font.mono,fontSize:11,color:step===i?"#fff":s.color,background:step===i?s.color:`${s.color}12`,border:`1px solid ${s.color}30`,borderRadius:3,padding:"4px 12px",cursor:"pointer",transition:"all 0.2s"}}>{i+1}</button>
-        ))}
-      </div>
-      <Card accent={steps[step].color} style={{border:`2px solid ${steps[step].color}30`}}>
-        <div style={{paddingTop:8}}>
-          <Tag color={steps[step].color}>STEP {step+1} OF {steps.length}</Tag>
-          <H3 style={{marginTop:10}} color={steps[step].color}>{steps[step].title}</H3>
-          <P>{steps[step].detail}</P>
-        </div>
-      </Card>
-    </div>
-  );
-}
-
-function SectionTradeoffs() {
-  const [open, setOpen] = useState(null);
-  return (
-    <div style={{display:"flex",flexDirection:"column",gap:12}}>
-      <P style={{marginBottom:4}}>Every memory design involves trade-offs. Click a dimension to understand the tension.</P>
-      {TRADEOFFS.map((t,i) => (
-        <Card key={i} onClick={() => setOpen(open===i?null:i)}
-          style={{border:open===i?`2px solid ${C.purple}`:`1px solid ${C.border}`,padding:open===i?"16px 19px":20,transition:"all 0.2s"}}>
-          <div style={{display:"flex",alignItems:"center",gap:12}}>
-            <H3 color={open===i?C.purple:C.text}>{t.dim}</H3>
-            <P style={{fontSize:12,marginLeft:4}}>{t.desc}</P>
-            <span style={{fontFamily:font.mono,fontSize:11,color:C.muted,marginLeft:"auto"}}>{open===i?"▲":"▼"}</span>
-          </div>
-          {open===i && (
-            <div style={{marginTop:12,display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
-              <div style={{padding:12,background:`${C.green}05`,border:`1px solid ${C.green}15`,borderRadius:4}}>
-                <div style={{fontFamily:font.mono,fontSize:10,color:C.green,textTransform:"uppercase",letterSpacing:1,marginBottom:6}}>WINS</div>
-                <P style={{fontSize:12.5}}>{t.winner}</P>
-              </div>
-              <div style={{padding:12,background:`${C.red}05`,border:`1px solid ${C.red}15`,borderRadius:4}}>
-                <div style={{fontFamily:font.mono,fontSize:10,color:C.red,textTransform:"uppercase",letterSpacing:1,marginBottom:6}}>STRUGGLES</div>
-                <P style={{fontSize:12.5}}>{t.loser}</P>
-              </div>
-            </div>
-          )}
-        </Card>
-      ))}
-    </div>
-  );
-}
-
-export default function MemoryExplainer() {
-  const [tab, setTab] = useState(0);
-  const TABS = ["The Problem","Memory Types","How It Works","Trade-offs"];
-  const sections = [<SectionProblem/>,<SectionTypes/>,<SectionHowItWorks/>,<SectionTradeoffs/>];
-  return (
-    <div style={{background:C.bg,minHeight:"100vh",fontFamily:font.body,color:C.text}}>
-      <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
-      <div style={{padding:"32px 24px 0",maxWidth:800,margin:"0 auto"}}>
-        <span style={{fontFamily:font.mono,fontSize:11,color:C.accent,background:`${C.accent}10`,padding:"2px 10px",borderRadius:3,letterSpacing:2,textTransform:"uppercase"}}>Visual Explainer</span>
-        <h1 style={{fontFamily:font.heading,fontSize:30,fontWeight:700,color:C.text,margin:"8px 0 4px",lineHeight:1.2,letterSpacing:-0.5}}>How AI Memory Works</h1>
-        <P>The four types of memory in AI systems, how they're layered together, and the trade-offs that every design must navigate.</P>
-      </div>
-      <div style={{maxWidth:800,margin:"20px auto 0",padding:"0 24px",display:"flex",gap:4,flexWrap:"wrap"}}>
-        {TABS.map((t,i) => (<button key={i} onClick={() => setTab(i)} style={{fontFamily:font.heading,fontSize:12,fontWeight:tab===i?700:500,color:tab===i?C.accent:C.sub,background:tab===i?`${C.accent}08`:"transparent",border:`1px solid ${tab===i?`${C.accent}30`:"transparent"}`,borderRadius:4,padding:"8px 14px",cursor:"pointer",transition:"all 0.2s"}}>{t}</button>))}
-      </div>
-      <div style={{maxWidth:800,margin:"16px auto 40px",padding:"0 24px"}}>{sections[tab]}</div>
-      <div style={{maxWidth:800,margin:"0 auto",padding:"16px 24px 32px",borderTop:`1px solid ${C.border}`}}>
-        <P style={{fontSize:11,color:C.muted,textAlign:"center"}}><a href="claude-cowork.html" style={{color:C.accent,textDecoration:"none"}}>← Claude Cowork</a> · <a href="index.html" style={{color:C.accent,textDecoration:"none"}}>AI Concepts Series</a> · <a href="agentic-system.html" style={{color:C.accent,textDecoration:"none"}}>Agentic Systems →</a></P>
-      </div>
-    </div>
-  );
-}
-ReactDOM.createRoot(document.getElementById('root')).render(<MemoryExplainer/>);
-</script></body></html>
+    document.querySelectorAll('.expand-card').forEach(card => {
+      card.addEventListener('click', function() {
+        this.classList.toggle('expanded');
+      });
+    });
+  </script>
+</body>
+</html>

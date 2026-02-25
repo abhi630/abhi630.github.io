@@ -1,190 +1,513 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Semantics in AI — Visual Explainer</title>
-<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-<style>*{box-sizing:border-box;margin:0;padding:0}body{background:#f8f8f6}</style>
-</head><body><div id="root"></div>
-<script type="text/babel">
-const { useState } = React;
-const C = { bg:"#f8f8f6",card:"#fff",border:"#e5e5e0",text:"#222",sub:"#666",muted:"#999",accent:"#ea580c",blue:"#0891b2",purple:"#7c3aed",green:"#16a34a",amber:"#ca8a04",red:"#dc2626" };
-const font = { heading:"'Space Grotesk', sans-serif", body:"'IBM Plex Sans', sans-serif", mono:"'JetBrains Mono', monospace" };
-const Card = ({ children, style, accent, onClick }) => (
-  <div onClick={onClick} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:4,padding:20,position:"relative",overflow:"hidden",boxShadow:"0 1px 3px rgba(0,0,0,0.04)",cursor:onClick?"pointer":"default",...style}}>
-    {accent && <div style={{position:"absolute",top:0,left:0,right:0,height:3,background:accent}}/>}
-    {children}
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Semantics in AI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background: #f8f8f6;
+      font-family: 'IBM Plex Sans', sans-serif;
+      color: #333;
+      padding: 40px 20px;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 30px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin-bottom: 12px;
+    }
+    .subtitle {
+      font-size: 15px;
+      color: #666;
+      margin-bottom: 32px;
+      line-height: 1.6;
+    }
+    .tabs {
+      display: flex;
+      gap: 0;
+      margin-bottom: 32px;
+      border-bottom: 1px solid #e5e5e0;
+      overflow-x: auto;
+    }
+    .tab {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 12px 16px;
+      cursor: pointer;
+      color: #666;
+      border: none;
+      background: none;
+      border-bottom: 2px solid transparent;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+    }
+    .tab:hover {
+      color: #333;
+    }
+    .tab.active {
+      color: #ea580c;
+      background: #ea580c08;
+      border-bottom: 2px solid #ea580c;
+    }
+    .sections {
+      position: relative;
+    }
+    .section {
+      display: none;
+    }
+    .section.active {
+      display: block;
+    }
+    .card {
+      background: white;
+      border: 1px solid #e5e5e0;
+      border-radius: 4px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+      padding: 24px;
+      margin-bottom: 20px;
+      position: relative;
+      padding-top: 28px;
+    }
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 3px;
+      width: 100%;
+      border-radius: 4px 4px 0 0;
+    }
+    .card.blue::before {
+      background: #0891b2;
+    }
+    .card.purple::before {
+      background: #7c3aed;
+    }
+    .card.green::before {
+      background: #16a34a;
+    }
+    .card.orange::before {
+      background: #ea580c;
+    }
+    .card.red::before {
+      background: #dc2626;
+    }
+    .card h3 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+    .card p {
+      font-size: 14px;
+      line-height: 1.6;
+      color: #555;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    @media (max-width: 600px) {
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+    }
+    .subtabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .subtab {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 8px 12px;
+      background: white;
+      border: 1px solid #e5e5e0;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .subtab:hover {
+      border-color: #d0d0cb;
+    }
+    .subtab.active {
+      background: #ea580c;
+      color: white;
+      border-color: #ea580c;
+    }
+    .subtab.blue.active {
+      background: #0891b2;
+      border-color: #0891b2;
+    }
+    .subtab.purple.active {
+      background: #7c3aed;
+      border-color: #7c3aed;
+    }
+    .subtab.green.active {
+      background: #16a34a;
+      border-color: #16a34a;
+    }
+    .subtab.orange.active {
+      background: #ea580c;
+      border-color: #ea580c;
+    }
+    .subtab-content {
+      display: none;
+    }
+    .subtab-content.active {
+      display: block;
+    }
+    .expand-card {
+      background: white;
+      border: 1px solid #e5e5e0;
+      border-radius: 4px;
+      padding: 20px;
+      margin-bottom: 16px;
+      cursor: pointer;
+      position: relative;
+      padding-left: 28px;
+      transition: box-shadow 0.2s ease;
+    }
+    .expand-card:hover {
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    }
+    .expand-card::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      border-radius: 4px 0 0 4px;
+    }
+    .expand-card.red::before {
+      background: #dc2626;
+    }
+    .expand-card.amber::before {
+      background: #ca8a04;
+    }
+    .expand-card.purple::before {
+      background: #7c3aed;
+    }
+    .expand-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .expand-content {
+      font-size: 13px;
+      line-height: 1.5;
+      color: #666;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+    }
+    .expand-card.expanded .expand-content {
+      max-height: 400px;
+    }
+    .expand-icon {
+      font-size: 12px;
+      float: right;
+      transition: transform 0.3s ease;
+    }
+    .expand-card.expanded .expand-icon {
+      transform: rotate(180deg);
+    }
+    .concept-card {
+      background: white;
+      border: 1px solid #e5e5e0;
+      border-radius: 4px;
+      padding: 20px;
+      margin-bottom: 12px;
+      position: relative;
+      padding-left: 28px;
+    }
+    .concept-card::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      border-radius: 4px 0 0 4px;
+    }
+    .concept-card.blue::before {
+      background: #0891b2;
+    }
+    .concept-card.purple::before {
+      background: #7c3aed;
+    }
+    .concept-card.green::before {
+      background: #16a34a;
+    }
+    .concept-card.orange::before {
+      background: #ea580c;
+    }
+    .concept-card h4 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .concept-card p {
+      font-size: 13px;
+      line-height: 1.5;
+      color: #666;
+      margin-bottom: 8px;
+    }
+    .use-case-list {
+      font-size: 12px;
+      line-height: 1.6;
+      color: #666;
+    }
+    .use-case-list ul {
+      margin-left: 20px;
+      margin-top: 8px;
+    }
+    .footer {
+      margin-top: 48px;
+      padding-top: 24px;
+      border-top: 1px solid #e5e5e0;
+      font-size: 13px;
+      color: #999;
+      text-align: center;
+    }
+    .footer a {
+      color: #0891b2;
+      text-decoration: none;
+    }
+    .footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Semantics in AI</h1>
+    <p class="subtitle">How AI systems represent and reason about meaning — the foundation of everything from search to ChatGPT.</p>
+    
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab(0)">What It Means</button>
+      <button class="tab" onclick="switchTab(1)">Core Concepts</button>
+      <button class="tab" onclick="switchTab(2)">Use Cases</button>
+      <button class="tab" onclick="switchTab(3)">Limitations</button>
+    </div>
+
+    <div class="sections">
+      <!-- Tab 0: What It Means -->
+      <div class="section active">
+        <div class="card orange">
+          <p><strong>Semantics is the study of meaning. In AI, it refers to how systems represent, reason about, and work with the meaning of language — not just its surface form. It's the difference between pattern-matching text and understanding it.</strong></p>
+        </div>
+
+        <div class="grid-2">
+          <div class="card red">
+            <h3>Syntactic (surface)</h3>
+            <p>Treats text as a sequence of characters. Knows 'cat' and 'cat' are the same. Doesn't know 'cat' and 'feline' are related.</p>
+          </div>
+          <div class="card green">
+            <h3>Semantic (meaning)</h3>
+            <p>Knows that 'cat', 'feline', and 'kitty' are semantically close. Knows 'deposit' means different things in banking vs. geology.</p>
+          </div>
+        </div>
+
+        <div class="card purple">
+          <p><strong>The jump from keyword search to ChatGPT is fundamentally a jump from syntactic to semantic processing.</strong> Everything powerful about modern AI rests on this foundation.</p>
+        </div>
+      </div>
+
+      <!-- Tab 1: Core Concepts -->
+      <div class="section">
+        <div class="subtabs">
+          <button class="subtab blue active" onclick="switchSubtab(event, 0)">Meaning vs Syntax</button>
+          <button class="subtab purple" onclick="switchSubtab(event, 1)">Embeddings</button>
+          <button class="subtab orange" onclick="switchSubtab(event, 2)">Context Sensitivity</button>
+          <button class="subtab green" onclick="switchSubtab(event, 3)">Intent Recognition</button>
+        </div>
+
+        <div class="subtab-content active">
+          <div class="concept-card blue">
+            <h4>Meaning vs Syntax</h4>
+            <p><strong>Short:</strong> Semantics is about what words mean, not how they're spelled or arranged.</p>
+            <p><strong>Detail:</strong> A syntax-only system sees 'bank' as 6 characters. A semantic system understands that 'bank' means something different beside a river than in a financial sentence.</p>
+            <p style="margin-top: 12px;"><strong>Examples:</strong></p>
+            <ul style="margin-left: 20px; margin-top: 6px;">
+              <li>"I went to the bank to deposit money" → financial institution</li>
+              <li>"The river bank was muddy" → land beside water</li>
+              <li>Same word, completely different meaning</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="subtab-content">
+          <div class="concept-card purple">
+            <h4>Embeddings</h4>
+            <p><strong>Short:</strong> The way AI converts words and sentences into lists of numbers that encode meaning.</p>
+            <p><strong>Detail:</strong> An embedding maps every word/sentence to a point in a high-dimensional space. Words with similar meanings land near each other. This is how AI 'understands' similarity without rules.</p>
+            <p style="margin-top: 12px;"><strong>Examples:</strong></p>
+            <ul style="margin-left: 20px; margin-top: 6px;">
+              <li>"dog" and "puppy" land close together in embedding space</li>
+              <li>"king" - "man" + "woman" ≈ "queen" (vector arithmetic)</li>
+              <li>Search engines use this to find relevant docs, not just keyword matches</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="subtab-content">
+          <div class="concept-card orange">
+            <h4>Context Sensitivity</h4>
+            <p><strong>Short:</strong> The same word means different things depending on the words around it.</p>
+            <p><strong>Detail:</strong> Modern AI handles this with attention mechanisms — each word 'attends' to every other word in the sentence, building meaning that's sensitive to full context.</p>
+            <p style="margin-top: 12px;"><strong>Examples:</strong></p>
+            <ul style="margin-left: 20px; margin-top: 6px;">
+              <li>"Make it pop" means different things to a designer vs. a chemist</li>
+              <li>"I can't recommend him highly enough" = strong praise or criticism?</li>
+              <li>Context resolves ambiguity that syntax alone cannot</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="subtab-content">
+          <div class="concept-card green">
+            <h4>Intent Recognition</h4>
+            <p><strong>Short:</strong> Understanding what a user actually wants, not just the literal words they typed.</p>
+            <p><strong>Detail:</strong> Semantic understanding means 'fix my code' and 'my code is broken, help' are the same request. AI maps surface-level phrasing to underlying user intent.</p>
+            <p style="margin-top: 12px;"><strong>Examples:</strong></p>
+            <ul style="margin-left: 20px; margin-top: 6px;">
+              <li>"How do I get rid of this headache?" → pain relief advice</li>
+              <li>Search: "cheap flights London" → user intent is to book, not just browse</li>
+              <li>"Cancel my order" and "I want a refund" → same intent</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 2: Use Cases -->
+      <div class="section">
+        <div class="subtabs">
+          <button class="subtab blue active" onclick="switchSubtab(event, 0)">Semantic Search</button>
+          <button class="subtab purple" onclick="switchSubtab(event, 1)">Chatbots</button>
+          <button class="subtab orange" onclick="switchSubtab(event, 2)">Summarisation</button>
+          <button class="subtab green" onclick="switchSubtab(event, 3)">Translation</button>
+          <button class="subtab orange" onclick="switchSubtab(event, 4)">Anomaly Detection</button>
+        </div>
+
+        <div class="subtab-content active">
+          <div class="concept-card blue">
+            <h4>Semantic Search</h4>
+            <p><strong>Desc:</strong> Find documents by meaning, not just keyword overlap.</p>
+            <p><strong>How:</strong> Query and documents are both embedded. The closest vectors in meaning are returned — even with zero word overlap.</p>
+            <p><strong>Example:</strong> Search 'heart attack' returns results about 'myocardial infarction'</p>
+          </div>
+        </div>
+
+        <div class="subtab-content">
+          <div class="concept-card purple">
+            <h4>Chatbots</h4>
+            <p><strong>Desc:</strong> Understand what users mean across all the ways they might phrase something.</p>
+            <p><strong>How:</strong> Intent classification maps user utterances to defined intents via semantic similarity.</p>
+            <p><strong>Example:</strong> "Cancel my order", "I want a refund", "Stop my subscription" → same intent</p>
+          </div>
+        </div>
+
+        <div class="subtab-content">
+          <div class="concept-card orange">
+            <h4>Summarisation</h4>
+            <p><strong>Desc:</strong> Condense long text by identifying the semantically core ideas.</p>
+            <p><strong>How:</strong> The model identifies which sentences carry the most meaning and removes paraphrase and repetition.</p>
+            <p><strong>Example:</strong> 10-page report → 3-paragraph summary preserving all key decisions</p>
+          </div>
+        </div>
+
+        <div class="subtab-content">
+          <div class="concept-card green">
+            <h4>Translation</h4>
+            <p><strong>Desc:</strong> Preserve meaning across languages, not just word-for-word substitution.</p>
+            <p><strong>How:</strong> Neural models learn cross-lingual semantic spaces where equivalent meanings cluster together.</p>
+            <p><strong>Example:</strong> Idioms, tone, and cultural nuance are preserved, not just words</p>
+          </div>
+        </div>
+
+        <div class="subtab-content">
+          <div class="concept-card orange">
+            <h4>Anomaly Detection</h4>
+            <p><strong>Desc:</strong> Find text that doesn't match expected semantic patterns.</p>
+            <p><strong>How:</strong> Documents are embedded and outliers in semantic space are flagged for review.</p>
+            <p><strong>Example:</strong> Customer email saying "excellent, never using you again" flagged as anomalous</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 3: Limitations -->
+      <div class="section">
+        <div class="expand-card red">
+          <span class="expand-icon">▼</span>
+          <div class="expand-title">Meaning is not grounded</div>
+          <div class="expand-content">AI semantics is statistical correlation, not true understanding. It finds patterns between words without understanding what those words refer to in the physical world. <strong>Analogy:</strong> Knows 'fire is hot' correlates with 'fire causes burns' but has never felt heat.</div>
+        </div>
+
+        <div class="expand-card amber">
+          <span class="expand-icon">▼</span>
+          <div class="expand-title">Ambiguity can fool it</div>
+          <div class="expand-content">When context is thin or novel, semantic models pick the statistically likely interpretation — which may be wrong in edge cases. <strong>Analogy:</strong> Like assuming every 'bank' question is about money, because that's more common in training data.</div>
+        </div>
+
+        <div class="expand-card purple">
+          <span class="expand-icon">▼</span>
+          <div class="expand-title">Bias in embeddings</div>
+          <div class="expand-content">If training data has human biases — gender, race, cultural assumptions — embeddings encode and amplify those biases. <strong>Analogy:</strong> "Doctor" embedding landed closer to "man" than "woman" in older models, reflecting historical data skew.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      ← <a href="agentic-system.html">Agentic Systems</a> · <a href="index.html">AI Concepts Series</a> · <a href="automation.html">Automation</a> →
+    </div>
   </div>
-);
-const Tag = ({ color, children }) => <span style={{fontFamily:font.mono,fontSize:11,color,background:`${color}12`,border:`1px solid ${color}30`,padding:"2px 10px",borderRadius:3,letterSpacing:0.5,display:"inline-block"}}>{children}</span>;
-const H3 = ({ children, color }) => <h3 style={{fontFamily:font.heading,fontSize:16,fontWeight:700,color:color||C.text,margin:"0 0 8px"}}>{children}</h3>;
-const P = ({ children, style }) => <p style={{fontFamily:font.body,fontSize:13.5,color:C.sub,lineHeight:1.65,margin:0,...style}}>{children}</p>;
 
-const CONCEPTS = [
-  { id:"meaning", label:"Meaning vs. Syntax", color:C.blue,
-    short:"Semantics is about what words mean, not how they're spelled or arranged.",
-    detail:"A syntax-only system sees 'bank' as 6 characters. A semantic system understands that 'bank' means something different beside a river than in a financial sentence.",
-    example:["'I went to the bank to deposit money' → financial institution","'The river bank was muddy' → land beside water","Same word, completely different meaning"] },
-  { id:"embedding", label:"Embeddings", color:C.purple,
-    short:"The way AI converts words and sentences into lists of numbers that encode meaning.",
-    detail:"An embedding maps every word/sentence to a point in a high-dimensional space. Words with similar meanings land near each other. This is how AI 'understands' similarity without rules.",
-    example:["'dog' and 'puppy' land close together","'king' - 'man' + 'woman' ≈ 'queen' (vector arithmetic)","Search engines use this to find relevant docs, not just keyword matches"] },
-  { id:"context", label:"Context Sensitivity", color:C.amber,
-    short:"The same word means different things depending on the words around it.",
-    detail:"Modern AI handles this with attention mechanisms — each word 'attends' to every other word in the sentence, building a meaning that's sensitive to full context, not just the word in isolation.",
-    example:["'Make it pop' means different things to a designer vs. a chemist","'I can't recommend him highly enough' = strong praise or criticism?","Context resolves ambiguity that syntax alone cannot"] },
-  { id:"intent", label:"Intent Recognition", color:C.green,
-    short:"Understanding what a user actually wants, not just the literal words they typed.",
-    detail:"Semantic understanding means 'fix my code' and 'my code is broken, help' are the same request. AI maps surface-level phrasing to underlying user intent.",
-    example:["'How do I get rid of this headache?' → pain relief advice","'What's 2+2' vs 'Can you calculate 2+2' → same task","Search: 'cheap flights London' → user intent is to book, not just browse"] },
-];
+  <script>
+    function switchTab(i) {
+      document.querySelectorAll('.tab').forEach((t, j) => {
+        t.classList.toggle('active', i === j);
+      });
+      document.querySelectorAll('.section').forEach((s, j) => {
+        s.classList.toggle('active', i === j);
+      });
+    }
 
-const USES = [
-  { title:"Semantic Search", color:C.blue, desc:"Find documents by meaning, not just keyword overlap.", how:"Query and documents are both embedded. The closest vectors in meaning are returned — even with zero word overlap.", example:"Search 'heart attack' returns results about 'myocardial infarction'" },
-  { title:"Chatbots & Assistants", color:C.purple, desc:"Understand what users mean across all the ways they might phrase something.", how:"Intent classification maps user utterances to defined intents via semantic similarity.", example:"'Cancel my order', 'I want a refund', 'Stop my subscription' → same intent" },
-  { title:"Summarisation", color:C.amber, desc:"Condense long text by identifying the semantically core ideas.", how:"The model identifies which sentences carry the most meaning and removes paraphrase and repetition.", example:"10-page report → 3-paragraph summary preserving all key decisions" },
-  { title:"Translation", color:C.green, desc:"Preserve meaning across languages, not just word-for-word substitution.", how:"Neural models learn cross-lingual semantic spaces where equivalent meanings cluster together.", example:"Idioms, tone, and cultural nuance are preserved, not just words" },
-  { title:"Anomaly Detection", color:C.accent, desc:"Find text that doesn't match expected semantic patterns.", how:"Documents are embedded and outliers in semantic space are flagged for review.", example:"A customer email saying 'excellent, never using you again' flagged as anomalous" },
-];
+    function switchSubtab(event, i) {
+      const container = event.target.parentElement;
+      container.querySelectorAll('.subtab').forEach((t, j) => {
+        t.classList.toggle('active', i === j);
+      });
+      container.parentElement.querySelectorAll('.subtab-content').forEach((s, j) => {
+        s.classList.toggle('active', i === j);
+      });
+    }
 
-const LIMITS = [
-  { title:"Meaning is not grounded", color:C.red, desc:"AI semantics is statistical correlation, not true understanding. It finds patterns between words without understanding what those words refer to in the physical world.", analogy:"Knows 'fire is hot' correlates with 'fire causes burns' but has never felt heat." },
-  { title:"Ambiguity can fool it", color:C.amber, desc:"When context is thin or novel, semantic models pick the statistically likely interpretation — which may be wrong in edge cases.", analogy:"Like assuming every 'bank' question is about money, because that's more common in training data." },
-  { title:"Bias in embeddings", color:C.purple, desc:"If training data has human biases — gender, race, cultural assumptions — embeddings encode and amplify those biases.", analogy:"'Doctor' embedding lands closer to 'man' than 'woman' in older models, reflecting historical data skew." },
-];
-
-function SectionWhatItMeans() {
-  return (
-    <div style={{display:"flex",flexDirection:"column",gap:16}}>
-      <Card accent={C.accent}>
-        <div style={{paddingTop:8}}>
-          <Tag color={C.accent}>DEFINITION</Tag>
-          <P style={{marginTop:12,fontSize:15,color:C.text,fontWeight:500,lineHeight:1.7}}>
-            Semantics is the study of meaning. In AI, it refers to how systems represent, reason about, and work with the meaning of language — not just its surface form. It's the difference between pattern-matching text and understanding it.
-          </P>
-        </div>
-      </Card>
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16}}>
-        <Card>
-          <H3 color={C.red}>Syntactic (surface)</H3>
-          <P>Treats text as a sequence of characters or tokens. Knows "cat" and "cat" are the same. Doesn't know "cat" and "feline" are related.</P>
-        </Card>
-        <Card>
-          <H3 color={C.green}>Semantic (meaning)</H3>
-          <P>Knows that "cat", "feline", and "kitty" are semantically close. Knows "deposit" means different things in banking vs. geology.</P>
-        </Card>
-      </div>
-      <Card style={{background:`${C.purple}06`,border:`1px solid ${C.purple}20`}}>
-        <Tag color={C.purple}>KEY INSIGHT</Tag>
-        <P style={{marginTop:8}}>The jump from keyword search to ChatGPT is fundamentally a jump from syntactic to semantic processing. Everything powerful about modern AI rests on this foundation.</P>
-      </Card>
-    </div>
-  );
-}
-
-function SectionConcepts() {
-  const [active, setActive] = useState(0);
-  const c = CONCEPTS[active];
-  return (
-    <div style={{display:"flex",flexDirection:"column",gap:16}}>
-      <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
-        {CONCEPTS.map((cn,i) => (<button key={i} onClick={() => setActive(i)} style={{fontFamily:font.heading,fontSize:12,fontWeight:active===i?700:500,color:active===i?cn.color:C.sub,background:active===i?`${cn.color}08`:"transparent",border:`1px solid ${active===i?`${cn.color}30`:"transparent"}`,borderRadius:4,padding:"8px 14px",cursor:"pointer",transition:"all 0.2s"}}>{cn.label}</button>))}
-      </div>
-      <Card accent={c.color} style={{border:`2px solid ${c.color}30`}}>
-        <div style={{paddingTop:8}}>
-          <Tag color={c.color}>{c.label.toUpperCase()}</Tag>
-          <P style={{marginTop:10,fontSize:14,fontWeight:500,color:C.text,marginBottom:10}}>{c.short}</P>
-          <P style={{marginBottom:14}}>{c.detail}</P>
-          <div style={{fontFamily:font.mono,fontSize:10,color:C.muted,textTransform:"uppercase",letterSpacing:1,marginBottom:10}}>EXAMPLES</div>
-          {c.example.map((ex,i) => (
-            <div key={i} style={{display:"flex",gap:10,padding:"8px 0",borderBottom:i<c.example.length-1?`1px solid ${C.border}`:"none"}}>
-              <span style={{fontFamily:font.mono,fontSize:11,color:c.color,flexShrink:0}}>→</span>
-              <P style={{fontSize:12.5}}>{ex}</P>
-            </div>
-          ))}
-        </div>
-      </Card>
-    </div>
-  );
-}
-
-function SectionUses() {
-  const [active, setActive] = useState(0);
-  const u = USES[active];
-  return (
-    <div style={{display:"flex",flexDirection:"column",gap:16}}>
-      <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
-        {USES.map((us,i) => (<button key={i} onClick={() => setActive(i)} style={{fontFamily:font.heading,fontSize:12,fontWeight:active===i?700:500,color:active===i?us.color:C.sub,background:active===i?`${us.color}08`:"transparent",border:`1px solid ${active===i?`${us.color}30`:"transparent"}`,borderRadius:4,padding:"8px 14px",cursor:"pointer",transition:"all 0.2s"}}>{us.title}</button>))}
-      </div>
-      <Card accent={u.color} style={{border:`2px solid ${u.color}30`}}>
-        <div style={{paddingTop:8}}>
-          <Tag color={u.color}>{u.title.toUpperCase()}</Tag>
-          <P style={{marginTop:10,marginBottom:12,fontSize:14,fontWeight:500,color:C.text}}>{u.desc}</P>
-          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
-            <div style={{padding:12,background:`${u.color}05`,border:`1px solid ${u.color}15`,borderRadius:4}}>
-              <div style={{fontFamily:font.mono,fontSize:10,color:u.color,textTransform:"uppercase",letterSpacing:1,marginBottom:6}}>HOW</div>
-              <P style={{fontSize:12.5}}>{u.how}</P>
-            </div>
-            <div style={{padding:12,background:`${C.green}05`,border:`1px solid ${C.green}15`,borderRadius:4}}>
-              <div style={{fontFamily:font.mono,fontSize:10,color:C.green,textTransform:"uppercase",letterSpacing:1,marginBottom:6}}>EXAMPLE</div>
-              <P style={{fontSize:12.5}}>{u.example}</P>
-            </div>
-          </div>
-        </div>
-      </Card>
-    </div>
-  );
-}
-
-function SectionLimits() {
-  const [open, setOpen] = useState(null);
-  return (
-    <div style={{display:"flex",flexDirection:"column",gap:12}}>
-      <P style={{marginBottom:4}}>Semantic AI is powerful but not magic. These are the key limits to understand.</P>
-      {LIMITS.map((l,i) => (
-        <Card key={i} onClick={() => setOpen(open===i?null:i)}
-          style={{border:open===i?`2px solid ${l.color}`:`1px solid ${C.border}`,padding:open===i?"16px 19px":20,transition:"all 0.2s"}}>
-          <div style={{display:"flex",alignItems:"center",gap:12}}>
-            <Tag color={l.color}>LIMIT</Tag>
-            <H3 color={open===i?l.color:C.text}>{l.title}</H3>
-            <span style={{fontFamily:font.mono,fontSize:11,color:C.muted,marginLeft:"auto"}}>{open===i?"▲":"▼"}</span>
-          </div>
-          {open===i && (
-            <div style={{marginTop:12,display:"flex",flexDirection:"column",gap:10}}>
-              <P>{l.desc}</P>
-              <div style={{padding:10,background:`${l.color}05`,border:`1px solid ${l.color}15`,borderRadius:4}}>
-                <div style={{fontFamily:font.mono,fontSize:10,color:l.color,textTransform:"uppercase",letterSpacing:1,marginBottom:4}}>ANALOGY</div>
-                <P style={{fontSize:12.5,fontStyle:"italic"}}>{l.analogy}</P>
-              </div>
-            </div>
-          )}
-        </Card>
-      ))}
-    </div>
-  );
-}
-
-export default function SemanticsExplainer() {
-  const [tab, setTab] = useState(0);
-  const TABS = ["What It Means","Core Concepts","Use Cases","Limitations"];
-  const sections = [<SectionWhatItMeans/>,<SectionConcepts/>,<SectionUses/>,<SectionLimits/>];
-  return (
-    <div style={{background:C.bg,minHeight:"100vh",fontFamily:font.body,color:C.text}}>
-      <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
-      <div style={{padding:"32px 24px 0",maxWidth:800,margin:"0 auto"}}>
-        <span style={{fontFamily:font.mono,fontSize:11,color:C.accent,background:`${C.accent}10`,padding:"2px 10px",borderRadius:3,letterSpacing:2,textTransform:"uppercase"}}>Visual Explainer</span>
-        <h1 style={{fontFamily:font.heading,fontSize:30,fontWeight:700,color:C.text,margin:"8px 0 4px",lineHeight:1.2,letterSpacing:-0.5}}>Semantics in AI</h1>
-        <P>How AI systems represent and reason about meaning — the foundation of everything from search to ChatGPT.</P>
-      </div>
-      <div style={{maxWidth:800,margin:"20px auto 0",padding:"0 24px",display:"flex",gap:4,flexWrap:"wrap"}}>
-        {TABS.map((t,i) => (<button key={i} onClick={() => setTab(i)} style={{fontFamily:font.heading,fontSize:12,fontWeight:tab===i?700:500,color:tab===i?C.accent:C.sub,background:tab===i?`${C.accent}08`:"transparent",border:`1px solid ${tab===i?`${C.accent}30`:"transparent"}`,borderRadius:4,padding:"8px 14px",cursor:"pointer",transition:"all 0.2s"}}>{t}</button>))}
-      </div>
-      <div style={{maxWidth:800,margin:"16px auto 40px",padding:"0 24px"}}>{sections[tab]}</div>
-      <div style={{maxWidth:800,margin:"0 auto",padding:"16px 24px 32px",borderTop:`1px solid ${C.border}`}}>
-        <P style={{fontSize:11,color:C.muted,textAlign:"center"}}><a href="agentic-system.html" style={{color:C.accent,textDecoration:"none"}}>← Agentic Systems</a> · <a href="index.html" style={{color:C.accent,textDecoration:"none"}}>AI Concepts Series</a> · <a href="automation.html" style={{color:C.accent,textDecoration:"none"}}>Automation →</a></P>
-      </div>
-    </div>
-  );
-}
-ReactDOM.createRoot(document.getElementById('root')).render(<SemanticsExplainer/>);
-</script></body></html>
+    document.querySelectorAll('.expand-card').forEach(card => {
+      card.addEventListener('click', function() {
+        this.classList.toggle('expanded');
+      });
+    });
+  </script>
+</body>
+</html>

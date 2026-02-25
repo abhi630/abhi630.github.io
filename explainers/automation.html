@@ -1,176 +1,615 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>AI Automation — Visual Explainer</title>
-<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-<style>*{box-sizing:border-box;margin:0;padding:0}body{background:#f8f8f6}</style>
-</head><body><div id="root"></div>
-<script type="text/babel">
-const { useState } = React;
-const C = { bg:"#f8f8f6",card:"#fff",border:"#e5e5e0",text:"#222",sub:"#666",muted:"#999",accent:"#ea580c",blue:"#0891b2",purple:"#7c3aed",green:"#16a34a",amber:"#ca8a04",red:"#dc2626" };
-const font = { heading:"'Space Grotesk', sans-serif", body:"'IBM Plex Sans', sans-serif", mono:"'JetBrains Mono', monospace" };
-const Card = ({ children, style, accent, onClick }) => (
-  <div onClick={onClick} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:4,padding:20,position:"relative",overflow:"hidden",boxShadow:"0 1px 3px rgba(0,0,0,0.04)",cursor:onClick?"pointer":"default",...style}}>
-    {accent && <div style={{position:"absolute",top:0,left:0,right:0,height:3,background:accent}}/>}
-    {children}
-  </div>
-);
-const Tag = ({ color, children }) => <span style={{fontFamily:font.mono,fontSize:11,color,background:`${color}12`,border:`1px solid ${color}30`,padding:"2px 10px",borderRadius:3,letterSpacing:0.5,display:"inline-block"}}>{children}</span>;
-const H3 = ({ children, color }) => <h3 style={{fontFamily:font.heading,fontSize:16,fontWeight:700,color:color||C.text,margin:"0 0 8px"}}>{children}</h3>;
-const P = ({ children, style }) => <p style={{fontFamily:font.body,fontSize:13.5,color:C.sub,lineHeight:1.65,margin:0,...style}}>{children}</p>;
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Automation</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background: #f8f8f6;
+      font-family: 'IBM Plex Sans', sans-serif;
+      color: #333;
+      padding: 40px 20px;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 30px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin-bottom: 12px;
+    }
+    .subtitle {
+      font-size: 15px;
+      color: #666;
+      margin-bottom: 32px;
+      line-height: 1.6;
+    }
+    .tabs {
+      display: flex;
+      gap: 0;
+      margin-bottom: 32px;
+      border-bottom: 1px solid #e5e5e0;
+      overflow-x: auto;
+    }
+    .tab {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 12px 16px;
+      cursor: pointer;
+      color: #666;
+      border: none;
+      background: none;
+      border-bottom: 2px solid transparent;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+    }
+    .tab:hover {
+      color: #333;
+    }
+    .tab.active {
+      color: #ea580c;
+      background: #ea580c08;
+      border-bottom: 2px solid #ea580c;
+    }
+    .sections {
+      position: relative;
+    }
+    .section {
+      display: none;
+    }
+    .section.active {
+      display: block;
+    }
+    .card {
+      background: white;
+      border: 1px solid #e5e5e0;
+      border-radius: 4px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+      padding: 24px;
+      margin-bottom: 20px;
+      position: relative;
+      padding-top: 28px;
+    }
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 3px;
+      width: 100%;
+      border-radius: 4px 4px 0 0;
+    }
+    .card.blue::before {
+      background: #0891b2;
+    }
+    .card.purple::before {
+      background: #7c3aed;
+    }
+    .card.green::before {
+      background: #16a34a;
+    }
+    .card.orange::before {
+      background: #ea580c;
+    }
+    .card h3 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+    .card p {
+      font-size: 14px;
+      line-height: 1.6;
+      color: #555;
+    }
+    .level-buttons {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    .level-button {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 12px 8px;
+      border: 1px solid #e5e5e0;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: white;
+      color: #333;
+      text-align: center;
+    }
+    .level-button:hover {
+      border-color: #d0d0cb;
+    }
+    .level-button.active {
+      color: white;
+    }
+    .level-content {
+      display: none;
+    }
+    .level-content.active {
+      display: block;
+    }
+    .subtabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .subtab {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 8px 12px;
+      background: white;
+      border: 1px solid #e5e5e0;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .subtab:hover {
+      border-color: #d0d0cb;
+    }
+    .subtab.active {
+      background: #ea580c;
+      color: white;
+      border-color: #ea580c;
+    }
+    .subtab.blue.active {
+      background: #0891b2;
+      border-color: #0891b2;
+    }
+    .subtab.purple.active {
+      background: #7c3aed;
+      border-color: #7c3aed;
+    }
+    .subtab.green.active {
+      background: #16a34a;
+      border-color: #16a34a;
+    }
+    .subtab.orange.active {
+      background: #ea580c;
+      border-color: #ea580c;
+    }
+    .subtab-content {
+      display: none;
+    }
+    .subtab-content.active {
+      display: block;
+    }
+    .comparison {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    @media (max-width: 600px) {
+      .comparison {
+        grid-template-columns: 1fr;
+      }
+    }
+    .comparison-side {
+      background: white;
+      border: 1px solid #e5e5e0;
+      border-radius: 4px;
+      padding: 20px;
+      position: relative;
+      padding-top: 24px;
+    }
+    .comparison-side::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 3px;
+      width: 100%;
+    }
+    .comparison-side h4 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+    .comparison-side ul {
+      margin-left: 20px;
+      color: #666;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    .comparison-label {
+      font-size: 11px;
+      color: #999;
+      text-transform: uppercase;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid #e5e5e0;
+    }
+    .expand-card {
+      background: white;
+      border: 1px solid #e5e5e0;
+      border-radius: 4px;
+      padding: 20px;
+      margin-bottom: 16px;
+      cursor: pointer;
+      position: relative;
+      padding-left: 28px;
+      transition: box-shadow 0.2s ease;
+    }
+    .expand-card:hover {
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    }
+    .expand-card::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      border-radius: 4px 0 0 4px;
+    }
+    .expand-card.blue::before {
+      background: #0891b2;
+    }
+    .expand-card.purple::before {
+      background: #7c3aed;
+    }
+    .expand-card.green::before {
+      background: #16a34a;
+    }
+    .expand-card.orange::before {
+      background: #ea580c;
+    }
+    .expand-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .expand-content {
+      font-size: 13px;
+      line-height: 1.5;
+      color: #666;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+    }
+    .expand-card.expanded .expand-content {
+      max-height: 400px;
+    }
+    .expand-icon {
+      font-size: 12px;
+      float: right;
+      transition: transform 0.3s ease;
+    }
+    .expand-card.expanded .expand-icon {
+      transform: rotate(180deg);
+    }
+    .footer {
+      margin-top: 48px;
+      padding-top: 24px;
+      border-top: 1px solid #e5e5e0;
+      font-size: 13px;
+      color: #999;
+      text-align: center;
+    }
+    .footer a {
+      color: #0891b2;
+      text-decoration: none;
+    }
+    .footer a:hover {
+      text-decoration: underline;
+    }
+    .callout-card {
+      background: white;
+      border: 1px solid #e5e5e0;
+      border-radius: 4px;
+      padding: 16px;
+      position: relative;
+      padding-left: 24px;
+      margin-bottom: 20px;
+    }
+    .callout-card::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: #7c3aed;
+      border-radius: 4px 0 0 4px;
+    }
+    .callout-card p {
+      font-size: 13px;
+      line-height: 1.6;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>AI Automation</h1>
+    <p class="subtitle">The full spectrum from manual to agentic — what changes before and after AI automation, and how to build it right.</p>
+    
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab(0)">The Spectrum</button>
+      <button class="tab" onclick="switchTab(1)">Before & After</button>
+      <button class="tab" onclick="switchTab(2)">Principles</button>
+    </div>
 
-const SPECTRUM = [
-  { level:1, name:"Manual", color:"#94a3b8", desc:"A human performs every step by hand. No automation at all.", example:"Copy-pasting rows from one spreadsheet to another", ai:false },
-  { level:2, name:"Scripted", color:C.blue, desc:"Deterministic code runs the same steps every time — no judgment required.", example:"A cron job that runs a SQL query and emails the result at 9am", ai:false },
-  { level:3, name:"Rule-based AI", color:C.amber, desc:"AI applies learned rules to variable inputs — classification, routing, filtering.", example:"Spam filter, sentiment classifier, intent router in a chatbot", ai:true },
-  { level:4, name:"Generative AI", color:C.accent, desc:"AI produces variable outputs — text, code, decisions — given variable inputs.", example:"Draft customer reply, write a report section, generate SQL from natural language", ai:true },
-  { level:5, name:"Agentic AI", color:C.purple, desc:"AI takes multi-step actions, uses tools, loops until a goal is reached — with minimal human direction.", example:"Research a topic, write a briefing, send it to stakeholders — all in one run", ai:true },
-];
+    <div class="sections">
+      <!-- Tab 0: The Spectrum -->
+      <div class="section active">
+        <div class="level-buttons">
+          <button class="level-button active" style="background: #94a3b8; color: white;" onclick="switchLevel(event, 0)">L1</button>
+          <button class="level-button" style="border-color: #0891b2; color: #0891b2;" onclick="switchLevel(event, 1)">L2</button>
+          <button class="level-button" style="border-color: #ca8a04; color: #ca8a04;" onclick="switchLevel(event, 2)">L3</button>
+          <button class="level-button" style="border-color: #ea580c; color: #ea580c;" onclick="switchLevel(event, 3)">L4</button>
+          <button class="level-button" style="border-color: #7c3aed; color: #7c3aed;" onclick="switchLevel(event, 4)">L5</button>
+        </div>
 
-const TASKS = [
-  { id:"docs", label:"Document Work", color:C.blue,
-    before:["Manually summarise each PDF","Copy-paste highlights into a doc","Spend 2h compiling a briefing"],
-    after:["Agent reads all PDFs","Extracts key points automatically","Briefing ready in 3 minutes"],
-    tool:"Cowork + PDF skill" },
-  { id:"content", label:"Content", color:C.purple,
-    before:["Write each post from scratch","Adapt tone manually per platform","One piece takes half a day"],
-    after:["One brief → multiple formats","Platform tone applied automatically","Week of content in 30 minutes"],
-    tool:"Cowork + content skills" },
-  { id:"data", label:"Data Pipelines", color:C.amber,
-    before:["Pull CSVs manually","Clean and format by hand","Build charts in Excel one by one"],
-    after:["Agent pulls, cleans, and charts","Anomalies flagged automatically","Runs daily without human involvement"],
-    tool:"Agent + code execution" },
-  { id:"research", label:"Research", color:C.green,
-    before:["Manually search and read sources","Take notes and synthesise by hand","Hours per topic"],
-    after:["Agent searches, reads, extracts","Synthesises across sources","Structured output in minutes"],
-    tool:"Agent + web search + RAG" },
-];
-
-const PRINCIPLES = [
-  { title:"Automate the repeatable", detail:"If a task follows the same steps every time and quality is measurable, it's a good automation candidate. If every instance requires fresh judgment, it's not.", color:C.blue },
-  { title:"Start with output, not process", detail:"Don't try to replicate how a human does a task. Define what a good output looks like, and let the AI find a route to it.", color:C.purple },
-  { title:"Keep a human in the loop for consequences", detail:"Any automation that sends emails, modifies files, or makes purchases should have a human review step unless the stakes are very low.", color:C.amber },
-  { title:"Measure quality explicitly", detail:"Automate only what you can evaluate. If you can't tell whether the output is good, you can't trust the automation.", color:C.green },
-  { title:"Build the simplest thing first", detail:"Start with a prompt and a manual trigger. Add scheduling, tools, and error handling only when you've validated the core output.", color:C.accent },
-];
-
-function SectionSpectrum() {
-  const [active, setActive] = useState(3);
-  const s = SPECTRUM[active];
-  return (
-    <div style={{display:"flex",flexDirection:"column",gap:16}}>
-      <P style={{marginBottom:4}}>Automation exists on a spectrum. Click a level to explore it.</P>
-      <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
-        {SPECTRUM.map((sp,i) => (
-          <button key={i} onClick={() => setActive(i)} style={{fontFamily:font.mono,fontSize:11,fontWeight:active===i?600:400,color:active===i?"#fff":sp.color,background:active===i?sp.color:`${sp.color}12`,border:`1px solid ${sp.color}30`,borderRadius:3,padding:"5px 14px",cursor:"pointer",transition:"all 0.2s"}}>L{sp.level}: {sp.name}</button>
-        ))}
-      </div>
-      <Card accent={s.color} style={{border:`2px solid ${s.color}30`}}>
-        <div style={{paddingTop:8}}>
-          <div style={{display:"flex",gap:10,alignItems:"center",marginBottom:10}}>
-            <Tag color={s.color}>LEVEL {s.level}</Tag>
-            <H3 color={s.color}>{s.name}</H3>
-            {s.ai && <Tag color={C.green}>AI-powered</Tag>}
-          </div>
-          <P style={{marginBottom:12}}>{s.desc}</P>
-          <div style={{padding:12,background:`${s.color}05`,border:`1px solid ${s.color}15`,borderRadius:4}}>
-            <div style={{fontFamily:font.mono,fontSize:10,color:s.color,textTransform:"uppercase",letterSpacing:1,marginBottom:6}}>EXAMPLE</div>
-            <P style={{fontSize:12.5,fontStyle:"italic"}}>"{s.example}"</P>
+        <div class="level-content active">
+          <div class="card" style="position: relative; padding-top: 28px;"><div style="position: absolute; top: 0; left: 0; height: 3px; width: 100%; background: #94a3b8; border-radius: 4px 4px 0 0;"></div>
+            <h3>L1: Manual</h3>
+            <p>A human performs every step by hand. No automation at all.</p>
+            <p style="margin-top: 12px;"><strong>Example:</strong> Copy-pasting rows from one spreadsheet to another</p>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; font-size: 12px;">
+              <div><span style="color: #999; text-transform: uppercase;">Uses AI</span><br><strong>No</strong></div>
+            </div>
           </div>
         </div>
-      </Card>
-      <Card style={{background:`${C.purple}06`,border:`1px solid ${C.purple}20`}}>
-        <Tag color={C.purple}>KEY INSIGHT</Tag>
-        <P style={{marginTop:8}}>Most organisations live at L1-L2. The jump to L4-L5 (generative + agentic) is where 10x productivity gains become available — but also where design and oversight matter most.</P>
-      </Card>
-    </div>
-  );
-}
 
-function SectionBeforeAfter() {
-  const [active, setActive] = useState(0);
-  const task = TASKS[active];
-  return (
-    <div style={{display:"flex",flexDirection:"column",gap:16}}>
-      <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
-        {TASKS.map((t,i) => (<button key={i} onClick={() => setActive(i)} style={{fontFamily:font.heading,fontSize:12,fontWeight:active===i?700:500,color:active===i?t.color:C.sub,background:active===i?`${t.color}08`:"transparent",border:`1px solid ${active===i?`${t.color}30`:"transparent"}`,borderRadius:4,padding:"8px 14px",cursor:"pointer",transition:"all 0.2s"}}>{t.label}</button>))}
-      </div>
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16}}>
-        <Card>
-          <H3 color={C.red}>Before automation</H3>
-          {task.before.map((b,i) => (
-            <div key={i} style={{display:"flex",gap:10,padding:"8px 0",borderBottom:i<task.before.length-1?`1px solid ${C.border}`:"none"}}>
-              <span style={{fontFamily:font.mono,fontSize:11,color:C.red,flexShrink:0}}>✗</span>
-              <P style={{fontSize:12.5}}>{b}</P>
+        <div class="level-content">
+          <div class="card blue">
+            <h3>L2: Scripted</h3>
+            <p>Deterministic code runs the same steps every time — no judgment required.</p>
+            <p style="margin-top: 12px;"><strong>Example:</strong> A cron job that runs a SQL query and emails the result at 9am</p>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; font-size: 12px;">
+              <div><span style="color: #999; text-transform: uppercase;">Uses AI</span><br><strong>No</strong></div>
             </div>
-          ))}
-        </Card>
-        <Card accent={task.color}>
-          <div style={{paddingTop:8}}>
-          <H3 color={task.color}>After automation</H3>
-          {task.after.map((a,i) => (
-            <div key={i} style={{display:"flex",gap:10,padding:"8px 0",borderBottom:i<task.after.length-1?`1px solid ${C.border}`:"none"}}>
-              <span style={{fontFamily:font.mono,fontSize:11,color:task.color,flexShrink:0}}>✓</span>
-              <P style={{fontSize:12.5}}>{a}</P>
-            </div>
-          ))}
-          <div style={{marginTop:12,padding:8,background:`${task.color}08`,borderRadius:3}}>
-            <span style={{fontFamily:font.mono,fontSize:10,color:task.color,letterSpacing:1}}>TOOL: </span>
-            <span style={{fontFamily:font.mono,fontSize:10,color:C.muted}}>{task.tool}</span>
           </div>
-          </div>
-        </Card>
-      </div>
-    </div>
-  );
-}
+        </div>
 
-function SectionPrinciples() {
-  const [open, setOpen] = useState(null);
-  return (
-    <div style={{display:"flex",flexDirection:"column",gap:12}}>
-      <P style={{marginBottom:4}}>Five principles for building automations that actually work and stay safe.</P>
-      {PRINCIPLES.map((p,i) => (
-        <Card key={i} onClick={() => setOpen(open===i?null:i)}
-          style={{border:open===i?`2px solid ${p.color}`:`1px solid ${C.border}`,padding:open===i?"16px 19px":20,transition:"all 0.2s"}}>
-          <div style={{display:"flex",alignItems:"center",gap:12}}>
-            <div style={{width:24,height:24,borderRadius:4,background:`${p.color}15`,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:font.mono,fontSize:11,color:p.color,fontWeight:600,flexShrink:0}}>{i+1}</div>
-            <H3 color={open===i?p.color:C.text}>{p.title}</H3>
-            <span style={{fontFamily:font.mono,fontSize:11,color:C.muted,marginLeft:"auto"}}>{open===i?"▲":"▼"}</span>
-          </div>
-          {open===i && (
-            <div style={{marginTop:10,paddingLeft:36}}>
-              <P>{p.detail}</P>
+        <div class="level-content">
+          <div class="card" style="position: relative; padding-top: 28px;"><div style="position: absolute; top: 0; left: 0; height: 3px; width: 100%; background: #ca8a04; border-radius: 4px 4px 0 0;"></div>
+            <h3>L3: Rule-based AI</h3>
+            <p>AI applies learned rules to variable inputs — classification, routing, filtering.</p>
+            <p style="margin-top: 12px;"><strong>Example:</strong> Spam filter, sentiment classifier, intent router in a chatbot</p>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; font-size: 12px;">
+              <div><span style="color: #999; text-transform: uppercase;">Uses AI</span><br><strong>Yes</strong></div>
             </div>
-          )}
-        </Card>
-      ))}
-    </div>
-  );
-}
+          </div>
+        </div>
 
-export default function AutomationExplainer() {
-  const [tab, setTab] = useState(0);
-  const TABS = ["The Spectrum","Before & After","Principles"];
-  const sections = [<SectionSpectrum/>,<SectionBeforeAfter/>,<SectionPrinciples/>];
-  return (
-    <div style={{background:C.bg,minHeight:"100vh",fontFamily:font.body,color:C.text}}>
-      <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
-      <div style={{padding:"32px 24px 0",maxWidth:800,margin:"0 auto"}}>
-        <span style={{fontFamily:font.mono,fontSize:11,color:C.accent,background:`${C.accent}10`,padding:"2px 10px",borderRadius:3,letterSpacing:2,textTransform:"uppercase"}}>Visual Explainer</span>
-        <h1 style={{fontFamily:font.heading,fontSize:30,fontWeight:700,color:C.text,margin:"8px 0 4px",lineHeight:1.2,letterSpacing:-0.5}}>AI Automation</h1>
-        <P>The full spectrum from manual to agentic — what changes before and after AI automation, and how to build it right.</P>
+        <div class="level-content">
+          <div class="card orange">
+            <h3>L4: Generative AI</h3>
+            <p>AI produces variable outputs — text, code, decisions — given variable inputs.</p>
+            <p style="margin-top: 12px;"><strong>Example:</strong> Draft customer reply, write a report section, generate SQL from natural language</p>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; font-size: 12px;">
+              <div><span style="color: #999; text-transform: uppercase;">Uses AI</span><br><strong>Yes</strong></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="level-content">
+          <div class="card purple">
+            <h3>L5: Agentic AI</h3>
+            <p>AI takes multi-step actions, uses tools, loops until a goal is reached — with minimal human direction.</p>
+            <p style="margin-top: 12px;"><strong>Example:</strong> Research a topic, write a briefing, send it to stakeholders — all in one run</p>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; font-size: 12px;">
+              <div><span style="color: #999; text-transform: uppercase;">Uses AI</span><br><strong>Yes</strong></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="callout-card">
+          <p><strong>Most organisations live at L1-L2.</strong> The jump to L4-L5 (generative + agentic) is where 10x productivity gains become available — but also where design and oversight matter most.</p>
+        </div>
       </div>
-      <div style={{maxWidth:800,margin:"20px auto 0",padding:"0 24px",display:"flex",gap:4,flexWrap:"wrap"}}>
-        {TABS.map((t,i) => (<button key={i} onClick={() => setTab(i)} style={{fontFamily:font.heading,fontSize:12,fontWeight:tab===i?700:500,color:tab===i?C.accent:C.sub,background:tab===i?`${C.accent}08`:"transparent",border:`1px solid ${tab===i?`${C.accent}30`:"transparent"}`,borderRadius:4,padding:"8px 14px",cursor:"pointer",transition:"all 0.2s"}}>{t}</button>))}
+
+      <!-- Tab 1: Before & After -->
+      <div class="section">
+        <div class="subtabs">
+          <button class="subtab blue active" onclick="switchSubtab(event, 0)">Document Work</button>
+          <button class="subtab purple" onclick="switchSubtab(event, 1)">Content</button>
+          <button class="subtab orange" onclick="switchSubtab(event, 2)">Data Pipelines</button>
+          <button class="subtab green" onclick="switchSubtab(event, 3)">Research</button>
+        </div>
+
+        <div class="subtab-content active">
+          <div class="comparison">
+            <div class="comparison-side" style="border-top: 3px solid #0891b2;">
+              <h4>Before</h4>
+              <ul>
+                <li>Manually summarise each PDF</li>
+                <li>Copy-paste highlights into a doc</li>
+                <li>Spend 2h compiling a briefing</li>
+              </ul>
+              <div class="comparison-label">Time: 2 hours</div>
+            </div>
+            <div class="comparison-side" style="border-top: 3px solid #16a34a;">
+              <h4>After</h4>
+              <ul>
+                <li>Agent reads all PDFs</li>
+                <li>Extracts key points automatically</li>
+                <li>Briefing ready in 3 minutes</li>
+              </ul>
+              <div class="comparison-label">Time: 3 minutes</div>
+              <div class="comparison-label" style="margin-top: 4px;">Tool: Cowork + PDF skill</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="subtab-content">
+          <div class="comparison">
+            <div class="comparison-side" style="border-top: 3px solid #0891b2;">
+              <h4>Before</h4>
+              <ul>
+                <li>Write each post from scratch</li>
+                <li>Adapt tone manually per platform</li>
+                <li>One piece takes half a day</li>
+              </ul>
+              <div class="comparison-label">Time: 4 hours per post</div>
+            </div>
+            <div class="comparison-side" style="border-top: 3px solid #16a34a;">
+              <h4>After</h4>
+              <ul>
+                <li>One brief → multiple formats</li>
+                <li>Platform tone applied automatically</li>
+                <li>Week of content in 30 minutes</li>
+              </ul>
+              <div class="comparison-label">Time: 30 minutes</div>
+              <div class="comparison-label" style="margin-top: 4px;">Tool: Cowork + content skills</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="subtab-content">
+          <div class="comparison">
+            <div class="comparison-side" style="border-top: 3px solid #0891b2;">
+              <h4>Before</h4>
+              <ul>
+                <li>Pull CSVs manually</li>
+                <li>Clean and format by hand</li>
+                <li>Build charts in Excel one by one</li>
+              </ul>
+              <div class="comparison-label">Time: 1 hour per run</div>
+            </div>
+            <div class="comparison-side" style="border-top: 3px solid #16a34a;">
+              <h4>After</h4>
+              <ul>
+                <li>Agent pulls, cleans, and charts</li>
+                <li>Anomalies flagged automatically</li>
+                <li>Runs daily without human involvement</li>
+              </ul>
+              <div class="comparison-label">Time: 2 minutes setup</div>
+              <div class="comparison-label" style="margin-top: 4px;">Tool: Agent + code execution</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="subtab-content">
+          <div class="comparison">
+            <div class="comparison-side" style="border-top: 3px solid #0891b2;">
+              <h4>Before</h4>
+              <ul>
+                <li>Manually search and read sources</li>
+                <li>Take notes and synthesise by hand</li>
+                <li>Hours per topic</li>
+              </ul>
+              <div class="comparison-label">Time: 3+ hours</div>
+            </div>
+            <div class="comparison-side" style="border-top: 3px solid #16a34a;">
+              <h4>After</h4>
+              <ul>
+                <li>Agent searches, reads, extracts</li>
+                <li>Synthesises across sources</li>
+                <li>Structured output in minutes</li>
+              </ul>
+              <div class="comparison-label">Time: 5 minutes</div>
+              <div class="comparison-label" style="margin-top: 4px;">Tool: Agent + web search + RAG</div>
+            </div>
+          </div>
+        </div>
       </div>
-      <div style={{maxWidth:800,margin:"16px auto 40px",padding:"0 24px"}}>{sections[tab]}</div>
-      <div style={{maxWidth:800,margin:"0 auto",padding:"16px 24px 32px",borderTop:`1px solid ${C.border}`}}>
-        <P style={{fontSize:11,color:C.muted,textAlign:"center"}}><a href="semantics.html" style={{color:C.accent,textDecoration:"none"}}>← Semantics</a> · <a href="index.html" style={{color:C.accent,textDecoration:"none"}}>AI Concepts Series</a> · <a href="claude.html" style={{color:C.accent,textDecoration:"none"}}>Start over: Claude →</a></P>
+
+      <!-- Tab 2: Principles -->
+      <div class="section">
+        <div class="expand-card blue">
+          <span class="expand-icon">▼</span>
+          <div class="expand-title">1. Automate the repeatable</div>
+          <div class="expand-content">If a task follows the same steps every time and quality is measurable, it's a good automation candidate. If every instance requires fresh judgment, it's not.</div>
+        </div>
+
+        <div class="expand-card purple">
+          <span class="expand-icon">▼</span>
+          <div class="expand-title">2. Start with output, not process</div>
+          <div class="expand-content">Don't try to replicate how a human does a task. Define what a good output looks like, and let the AI find a route to it.</div>
+        </div>
+
+        <div class="expand-card orange">
+          <span class="expand-icon">▼</span>
+          <div class="expand-title">3. Keep a human in the loop for consequences</div>
+          <div class="expand-content">Any automation that sends emails, modifies files, or makes purchases should have a human review step unless the stakes are very low.</div>
+        </div>
+
+        <div class="expand-card green">
+          <span class="expand-icon">▼</span>
+          <div class="expand-title">4. Measure quality explicitly</div>
+          <div class="expand-content">Automate only what you can evaluate. If you can't tell whether the output is good, you can't trust the automation.</div>
+        </div>
+
+        <div class="expand-card orange">
+          <span class="expand-icon">▼</span>
+          <div class="expand-title">5. Build the simplest thing first</div>
+          <div class="expand-content">Start with a prompt and a manual trigger. Add scheduling, tools, and error handling only when you've validated the core output.</div>
+        </div>
       </div>
     </div>
-  );
-}
-ReactDOM.createRoot(document.getElementById('root')).render(<AutomationExplainer/>);
-</script></body></html>
+
+    <div class="footer">
+      ← <a href="semantics.html">Semantics</a> · <a href="index.html">AI Concepts Series</a> · <a href="index.html">Start over: Claude</a> →
+    </div>
+  </div>
+
+  <script>
+    function switchTab(i) {
+      document.querySelectorAll('.tab').forEach((t, j) => {
+        t.classList.toggle('active', i === j);
+      });
+      document.querySelectorAll('.section').forEach((s, j) => {
+        s.classList.toggle('active', i === j);
+      });
+    }
+
+    function switchLevel(event, i) {
+      const container = event.target.parentElement;
+      const colors = ['#94a3b8', '#0891b2', '#ca8a04', '#ea580c', '#7c3aed'];
+      container.querySelectorAll('.level-button').forEach((t, j) => {
+        t.classList.toggle('active', i === j);
+        if (i === j) {
+          t.style.backgroundColor = colors[j];
+          t.style.color = 'white';
+        } else {
+          t.style.backgroundColor = 'white';
+          t.style.borderColor = colors[j];
+          t.style.color = colors[j];
+        }
+      });
+      container.parentElement.querySelectorAll('.level-content').forEach((s, j) => {
+        s.classList.toggle('active', i === j);
+      });
+    }
+
+    function switchSubtab(event, i) {
+      const container = event.target.parentElement;
+      container.querySelectorAll('.subtab').forEach((t, j) => {
+        t.classList.toggle('active', i === j);
+      });
+      container.parentElement.querySelectorAll('.subtab-content').forEach((s, j) => {
+        s.classList.toggle('active', i === j);
+      });
+    }
+
+    document.querySelectorAll('.expand-card').forEach(card => {
+      card.addEventListener('click', function() {
+        this.classList.toggle('expanded');
+      });
+    });
+  </script>
+</body>
+</html>
